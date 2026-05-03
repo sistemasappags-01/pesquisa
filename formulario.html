@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Pesquisa de satisfação — Restaurante Comunitário de Sobradinho">
+  <title>Pesquisa de Opinião — RC Sobradinho</title>
+  <!-- DM Sans — mesma fonte do dashboard, coerência visual entre telas -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <!-- Favicon SVG moderno — prato com colher e garfo, tom azul institucional -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Ctext x='16' y='22' font-size='18' text-anchor='middle' font-family='system-ui'>🍽️%3C/text%3E%3C/svg%3E">
+  <style>
+
+    /* ═══════════════════════════════════════════
+       TEMA CLARO — paleta moderna slate + vivid
+    ═══════════════════════════════════════════ */
+    :root {
+      /* Azul institucional — alinhado com dashboard */
+      --azul:         #2563eb;
+      --azul-dark:    #1d4ed8;
+      --azul-foco:    rgba(37,99,235,0.16);
+
+      /* Satisfação — paleta emerald/amber/rose */
+      --cor-otimo:      #059669;
+      --cor-bom:        #10b981;
+      --cor-regular:    #d97706;
+      --cor-ruim:       #e11d48;
+      --cor-otimo-bg:   rgba(5,150,105,  0.08);
+      --cor-bom-bg:     rgba(16,185,129, 0.08);
+      --cor-regular-bg: rgba(217,119,6,  0.10);
+      --cor-ruim-bg:    rgba(225,29,72,  0.08);
+
+      /* Identidade das refeições — mesmas do dashboard */
+      --cafe:           #ea580c;
+      --cafe-foco:      rgba(234,88,12,  0.14);
+      --almoco:         #0891b2;
+      --almoco-foco:    rgba(8,145,178,  0.14);
+      --jantar:         #7c3aed;
+      --jantar-foco:    rgba(124,58,237, 0.14);
+
+      /* Superfícies — slate neutro */
+      --page-bg:        #f8fafc;
+      --surface:        #ffffff;
+      --surface-raised: #f1f5f9;
+      --surface-border: #e2e8f0;
+
+      /* Texto — sistema slate */
+      --tx-primary:     #0f172a;
+      --tx-secondary:   #64748b;
+      --tx-muted:       #94a3b8;
+      --tx-placeholder: #cbd5e1;
+
+      /* Inputs */
+      --input-bg:       #ffffff;
+      --input-border:   #cbd5e1;
+      --divisor:        #e2e8f0;
+
+      /* Erro */
+      --erro-bg:        #fff1f2;
+      --erro-border:    #fda4af;
+      --erro-tx:        #be123c;
+
+      /* Sombras */
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+    }
+
+    /* ═══════════════════════════════════════════
+       TEMA ESCURO
+    ═══════════════════════════════════════════ */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --azul:         #60a5fa;
+        --azul-dark:    #93c5fd;
+        --azul-foco:    rgba(96,165,250,0.18);
+
+        --cor-otimo:      #34d399;
+        --cor-bom:        #6ee7b7;
+        --cor-regular:    #fbbf24;
+        --cor-ruim:       #fb7185;
+        --cor-otimo-bg:   rgba(52,211,153,  0.10);
+        --cor-bom-bg:     rgba(110,231,183, 0.10);
+        --cor-regular-bg: rgba(251,191,36,  0.10);
+        --cor-ruim-bg:    rgba(251,113,133, 0.10);
+
+        --cafe:           #fb923c;
+        --cafe-foco:      rgba(251,146,60,  0.15);
+        --almoco:         #22d3ee;
+        --almoco-foco:    rgba(34,211,238,  0.15);
+        --jantar:         #a78bfa;
+        --jantar-foco:    rgba(167,139,250, 0.15);
+
+        --page-bg:        #09090b;
+        --surface:        #18181b;
+        --surface-raised: #27272a;
+        --surface-border: #3f3f46;
+
+        --tx-primary:     #fafafa;
+        --tx-secondary:   #a1a1aa;
+        --tx-muted:       #71717a;
+        --tx-placeholder: #52525b;
+
+        --input-bg:       #09090b;
+        --input-border:   #3f3f46;
+        --divisor:        #3f3f46;
+
+        --erro-bg:        #1c0a0e;
+        --erro-border:    #9f1239;
+        --erro-tx:        #fda4af;
+
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+        --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+      }
+    }
+
+    /* ═══════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--page-bg);
+      color: var(--tx-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 20px 16px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .container {
+      background: var(--surface);
+      width: 100%;
+      max-width: 680px;
+      border-radius: 20px;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+
+    /* ═══════════════════════════════════════════
+       CABEÇALHO — azul coerente com dashboard
+    ═══════════════════════════════════════════ */
+    .cabecalho {
+      background: linear-gradient(160deg, #1e40af 0%, #2563eb 55%, #3b82f6 100%);
+      padding: 24px 24px 26px;
+      text-align: center;
+      border-bottom: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* padrão decorativo sutil no fundo */
+    .cabecalho::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 0%, rgba(255,255,255,0.10) 0%, transparent 60%),
+                  radial-gradient(ellipse at 10% 100%, rgba(255,255,255,0.06) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .cab-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 99px;
+      padding: 3px 12px;
+      font-size: 10px; font-weight: 700;
+      color: rgba(255,255,255,0.90);
+      letter-spacing: 1.2px; text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .cabecalho-titulo {
+      color: #fff; font-size: 26px; font-weight: 700;
+      line-height: 1.15; letter-spacing: -0.4px;
+      margin-bottom: 5px;
+    }
+
+    .cabecalho-unidade {
+      color: rgba(255,241,118,1); font-size: 13px; font-weight: 500;
+      letter-spacing: 0.5px; margin-bottom: 16px; text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+
+
+    /* ═══════════════════════════════════════════
+       CORPO
+    ═══════════════════════════════════════════ */
+    .corpo { padding: 28px 22px 24px; }
+
+    .instrucao {
+      text-align: center; font-size: 16px;
+      color: var(--tx-secondary); margin-bottom: 28px; line-height: 1.55;
+    }
+
+    .instrucao strong { color: var(--tx-primary); font-weight: 700; }
+
+    /* ═══════════════════════════════════════════
+       SELEÇÃO DE PERÍODO — cor própria por refeição
+    ═══════════════════════════════════════════ */
+    .periodo-box { margin-bottom: 28px; }
+
+    .periodo-titulo {
+      font-size: 11px; font-weight: 700;
+      color: var(--tx-muted); text-transform: uppercase;
+      letter-spacing: 0.8px; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .periodo-titulo::before,
+    .periodo-titulo::after {
+      content: ''; flex: 1; height: 1px; background: var(--divisor);
+    }
+
+    .periodo-opcoes { display: flex; gap: 10px; }
+
+    .periodo-btn {
+      flex: 1; padding: 16px 8px 14px;
+      border-radius: 14px;
+      border: 2px solid var(--surface-border);
+      background: var(--surface-raised);
+      cursor: pointer; text-align: center;
+      transition: all 0.18s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation; font-family: inherit;
+      position: relative; overflow: hidden;
+    }
+
+    /* faixa de cor no topo ao selecionar */
+    .periodo-btn::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      border-radius: 14px 14px 0 0;
+      opacity: 0; transition: opacity 0.18s;
+    }
+
+    .periodo-btn.cafe::before   { background: var(--cafe);   opacity: 1; }
+    .periodo-btn.almoco::before { background: var(--almoco); opacity: 1; }
+    .periodo-btn.jantar::before { background: var(--jantar); opacity: 1; }
+
+    .periodo-btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); }
+    .periodo-btn:active { transform: scale(0.97); }
+
+    /* estado selecionado com cor da refeição */
+    .periodo-btn.selecionado.cafe {
+      border-color: var(--cafe); background: var(--cafe-foco);
+    }
+    .periodo-btn.selecionado.almoco {
+      border-color: var(--almoco); background: var(--almoco-foco);
+    }
+    .periodo-btn.selecionado.jantar {
+      border-color: var(--jantar); background: var(--jantar-foco);
+    }
+
+    .periodo-icone {
+      font-size: 30px; display: block;
+      line-height: 1; margin-bottom: 7px;
+    }
+
+    .periodo-label {
+      font-size: 13px; font-weight: 700;
+      color: var(--tx-primary); display: block;
+      transition: color 0.18s;
+    }
+
+    .periodo-horario {
+      font-size: 10.5px; color: var(--tx-muted);
+      display: block; margin-top: 2px;
+    }
+
+    /* texto da refeição assume a cor ao selecionar */
+    .periodo-btn.selecionado.cafe   .periodo-label { color: var(--cafe); }
+    .periodo-btn.selecionado.almoco .periodo-label { color: var(--almoco); }
+    .periodo-btn.selecionado.jantar .periodo-label { color: var(--jantar); }
+
+    /* erro: nenhum selecionado */
+    .periodo-box.invalido .periodo-titulo { color: var(--cor-ruim); }
+    .periodo-box.invalido .periodo-titulo::before,
+    .periodo-box.invalido .periodo-titulo::after { background: var(--cor-ruim); opacity: 0.3; }
+    .periodo-box.invalido .periodo-btn:not(.selecionado) { border-color: rgba(225,29,72,0.35); }
+
+    /* ═══════════════════════════════════════════
+       BLOCOS DE AVALIAÇÃO
+    ═══════════════════════════════════════════ */
+    .avaliacoes { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+
+    .bloco {
+      background: var(--surface-raised);
+      border: 1.5px solid var(--surface-border);
+      border-radius: 16px; padding: 18px 16px 16px;
+      transition: background 0.3s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .bloco:focus-within {
+      border-color: rgba(37,99,235,0.30);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.06);
+    }
+
+    .bloco.bloco-invalido {
+      border-color: rgba(225,29,72,0.45);
+      box-shadow: 0 0 0 3px var(--cor-ruim-bg);
+    }
+
+    .bloco h3 {
+      font-size: 15px; font-weight: 700; color: var(--tx-primary);
+      text-align: center; margin-bottom: 18px; line-height: 1.3;
+    }
+
+    .faces { display: flex; justify-content: space-around; gap: 6px; }
+
+    .face {
+      cursor: pointer; text-align: center; flex: 1;
+      min-height: 52px; padding: 12px 5px 10px;
+      border-radius: 12px; border: 2px solid transparent;
+      background: transparent;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+      transition: border-color 0.16s, background 0.16s, transform 0.14s, box-shadow 0.16s;
+    }
+
+    .face:hover { transform: translateY(-4px); }
+    .face:active { transform: scale(0.95); }
+    .face:focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
+
+    .emoji { font-size: 34px; display: block; line-height: 1; }
+
+    .estrelas { display: flex; justify-content: center; gap: 1px; margin: 5px 0 3px; }
+    .estrelas span { font-size: 7px; }
+
+    .label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.5px; display: block; margin-top: 3px;
+      text-transform: uppercase;
+    }
+
+    .checkbox-visual { font-size: 11px; color: var(--tx-muted); margin-top: 4px; }
+
+    /* cores das notas */
+    .otimo   .label, .otimo   .estrelas span { color: var(--cor-otimo); }
+    .bom     .label, .bom     .estrelas span { color: var(--cor-bom); }
+    .regular .label, .regular .estrelas span { color: var(--cor-regular); }
+    .ruim    .label, .ruim    .estrelas span { color: var(--cor-ruim); }
+
+    /* selecionado — borda + fundo colorido */
+    .face.selecionado.otimo {
+      background: var(--cor-otimo-bg); border-color: var(--cor-otimo);
+      box-shadow: 0 0 0 2px rgba(5,150,105,0.12);
+    }
+    .face.selecionado.bom {
+      background: var(--cor-bom-bg); border-color: var(--cor-bom);
+      box-shadow: 0 0 0 2px rgba(16,185,129,0.12);
+    }
+    .face.selecionado.regular {
+      background: var(--cor-regular-bg); border-color: var(--cor-regular);
+      box-shadow: 0 0 0 2px rgba(217,119,6,0.12);
+    }
+    .face.selecionado.ruim {
+      background: var(--cor-ruim-bg); border-color: var(--cor-ruim);
+      box-shadow: 0 0 0 2px rgba(225,29,72,0.12);
+    }
+
+    /* ═══════════════════════════════════════════
+       OBSERVAÇÕES
+    ═══════════════════════════════════════════ */
+    .observacoes-box {
+      border-radius: 14px; padding: 16px;
+      margin-bottom: 18px;
+      border: 1.5px solid var(--surface-border);
+      background: var(--surface-raised);
+      transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+    }
+
+    /* opcional — sutil mas visível */
+    .observacoes-box.opcional {
+      border-style: dashed;
+      background: transparent;
+    }
+
+    /* atencao — alerta vermelho */
+    .observacoes-box.atencao {
+      border-style: solid;
+      border-color: rgba(225,29,72,0.40);
+      background: var(--erro-bg);
+      box-shadow: 0 0 0 3px var(--cor-ruim-bg);
+    }
+
+    .obs-cabecalho {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; margin-bottom: 8px;
+    }
+
+    .obs-label {
+      font-size: 13px; font-weight: 700;
+      color: var(--tx-primary); text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    .obs-badge {
+      font-size: 10px; font-weight: 700;
+      padding: 2px 9px; border-radius: 99px; letter-spacing: 0.4px;
+      border: 1.5px solid;
+    }
+
+    .obs-badge.opcional-badge {
+      background: var(--surface2, var(--surface-raised));
+      color: var(--tx-muted); border-color: var(--surface-border);
+    }
+
+    .obs-badge.obrigatorio-badge {
+      background: var(--cor-ruim-bg); color: var(--cor-ruim);
+      border-color: rgba(225,29,72,0.30);
+    }
+
+    .obs-dica {
+      font-size: 12.5px; color: var(--tx-secondary);
+      text-align: center; margin-bottom: 10px; line-height: 1.45;
+    }
+
+    .observacoes-box textarea {
+      width: 100%; resize: vertical; min-height: 88px;
+      border: none; border-bottom: 1.5px solid var(--divisor); outline: none;
+      font-size: 15px; font-family: inherit; color: var(--tx-primary);
+      background: transparent; line-height: 1.7; padding: 5px 2px;
+      border-radius: 0; transition: border-color 0.2s;
+    }
+
+    .observacoes-box textarea::placeholder { color: var(--tx-placeholder); }
+    .observacoes-box textarea:focus { border-bottom-color: var(--azul); }
+
+    /* ═══════════════════════════════════════════
+       IDENTIFICAÇÃO — colapsável
+    ═══════════════════════════════════════════ */
+    .identificacao-toggle {
+      width: 100%; background: var(--surface-raised);
+      border: 1.5px solid var(--surface-border); border-radius: 12px;
+      padding: 13px 16px; font-size: 14px; font-weight: 600;
+      color: var(--tx-secondary); font-family: inherit; cursor: pointer;
+      text-align: left; display: flex; align-items: center; justify-content: space-between;
+      transition: background 0.2s, border-color 0.2s;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    }
+
+    .identificacao-toggle:hover { border-color: var(--azul); color: var(--azul); }
+    .identificacao-toggle .seta { font-size: 12px; transition: transform 0.3s; flex-shrink: 0; }
+    .identificacao-toggle.aberto { border-color: var(--azul); color: var(--azul); }
+    .identificacao-toggle.aberto .seta { transform: rotate(180deg); }
+
+    .identificacao-campos { display: none; padding: 14px 0 4px; gap: 12px; flex-wrap: wrap; }
+    .identificacao-campos.visivel { display: flex; }
+
+    .campo-grupo { flex: 1; min-width: 140px; }
+
+    .campo-grupo label {
+      display: block; font-size: 11.5px; font-weight: 600;
+      color: var(--tx-secondary); margin-bottom: 5px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    .campo-grupo input {
+      width: 100%; padding: 11px 14px;
+      border: 1.5px solid var(--input-border); border-radius: 10px;
+      font-size: 15px; font-family: inherit; color: var(--tx-primary);
+      background: var(--input-bg); outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .campo-grupo input::placeholder { color: var(--tx-placeholder); }
+
+    .campo-grupo input:focus {
+      border-color: var(--azul);
+      box-shadow: 0 0 0 3px var(--azul-foco);
+    }
+
+    .identificacao-aviso {
+      font-size: 11.5px; color: var(--tx-muted);
+      margin-top: 10px; text-align: center; line-height: 1.45;
+    }
+
+    /* ═══════════════════════════════════════════
+       RODAPÉ DO FORMULÁRIO
+    ═══════════════════════════════════════════ */
+    .divider-rodape {
+      border: none; border-top: 1px solid var(--divisor);
+      margin: 22px 0 14px;
+    }
+
+    .ouvidoria {
+      font-size: 12.5px; color: var(--tx-secondary);
+      text-align: center; margin-bottom: 5px; font-weight: 600;
+    }
+
+    .lgpd {
+      font-size: 11px; color: var(--tx-muted);
+      text-align: center; margin-bottom: 20px; line-height: 1.5;
+    }
+
+    .erro-msg {
+      display: none; background: var(--erro-bg);
+      border: 1.5px solid var(--erro-border); color: var(--erro-tx);
+      border-radius: 10px; padding: 13px 16px; font-size: 14px;
+      font-weight: 600; margin-bottom: 14px; text-align: center; line-height: 1.4;
+    }
+
+    /* ═══════════════════════════════════════════
+       BOTÃO ENVIAR — usa variável, não hardcoded
+    ═══════════════════════════════════════════ */
+    .btn-enviar {
+      width: 100%; padding: 16px;
+      background: var(--azul);
+      color: #fff; border: none; border-radius: 12px;
+      font-size: 17px; font-weight: 700; font-family: inherit;
+      cursor: pointer; letter-spacing: 0.3px;
+      transition: filter 0.18s, transform 0.12s, opacity 0.2s;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+      box-shadow: 0 4px 14px rgba(37,99,235,0.30);
+    }
+
+    .btn-enviar:hover:not(:disabled)  { filter: brightness(1.08); box-shadow: 0 6px 20px rgba(37,99,235,0.35); }
+    .btn-enviar:active:not(:disabled) { transform: scale(0.98); filter: brightness(0.98); }
+    .btn-enviar:focus-visible          { outline: 3px solid var(--azul); outline-offset: 3px; }
+    .btn-enviar:disabled               { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+
+    /* ═══════════════════════════════════════════
+       TELA DE SUCESSO
+    ═══════════════════════════════════════════ */
+    .tela-sucesso {
+      display: none; text-align: center;
+      padding: 48px 28px 44px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .tela-sucesso .icone-wrap {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 90px; height: 90px; border-radius: 50%;
+      background: rgba(5,150,105,0.10); border: 2px solid rgba(5,150,105,0.25);
+      margin-bottom: 20px;
+      animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+    }
+
+    .tela-sucesso .icone { font-size: 44px; display: block; line-height: 1; }
+
+    .tela-sucesso h2 {
+      font-size: 26px; font-weight: 700;
+      color: var(--tx-primary); margin-bottom: 10px; letter-spacing: -0.3px;
+    }
+
+    .tela-sucesso p {
+      font-size: 15px; color: var(--tx-secondary);
+      margin-bottom: 8px; line-height: 1.6;
+    }
+
+    .tela-sucesso .sucesso-detalhe {
+      font-size: 13px; color: var(--tx-muted);
+      margin-bottom: 32px;
+    }
+
+    .btn-nova {
+      padding: 13px 40px;
+      background: var(--azul);
+      color: #fff; border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 700; font-family: inherit;
+      cursor: pointer;
+      transition: filter 0.18s;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+      box-shadow: 0 4px 14px rgba(37,99,235,0.25);
+    }
+
+    .btn-nova:hover { filter: brightness(1.08); }
+    .btn-nova:focus-visible { outline: 3px solid var(--azul); outline-offset: 3px; }
+
+    /* ═══════════════════════════════════════════
+       ANIMAÇÕES
+    ═══════════════════════════════════════════ */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ═══════════════════════════════════════════
+       RESPONSIVO MOBILE
+    ═══════════════════════════════════════════ */
+    @media (max-width: 500px) {
+      body { padding: 0; }
+      .container { border-radius: 0; box-shadow: none; min-height: 100vh; }
+      .corpo { padding: 20px 16px; }
+      .cabecalho { padding: 22px 18px 20px; }
+      .cabecalho-titulo { font-size: 22px; }
+      .emoji { font-size: 30px; }
+      .periodo-icone { font-size: 26px; }
+    }
+
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- CABEÇALHO -->
+  <div class="cabecalho">
+    <div class="cab-tag">Restaurante Comunitário de Sobradinho</div>
+    <div class="cabecalho-titulo">Pesquisa de Opinião</div>
+    <div class="cabecalho-unidade">Sua opnião alimenta mudanças!</div>
+  </div>
+
+  <!-- FORMULÁRIO -->
+  <div id="formulario" class="corpo">
+
+    <p class="instrucao">
+      <strong>Como foi sua experiência hoje?</strong><br>
+      Toque nos emojis para avaliar cada item.
+    </p>
+
+    <!-- PERÍODO -->
+    <div class="periodo-box" id="periodoBox">
+      <div class="periodo-titulo">Qual refeição você fez?</div>
+      <div class="periodo-opcoes">
+
+        <button class="periodo-btn cafe" type="button"
+                onclick="selecionarPeriodo(this,'Café da Manhã')">
+          <span class="periodo-icone">☕</span>
+          <span class="periodo-label">Café da Manhã</span>
+          <span class="periodo-horario">07h – 09h</span>
+        </button>
+
+        <button class="periodo-btn almoco" type="button"
+                onclick="selecionarPeriodo(this,'Almoço')">
+          <span class="periodo-icone">🍽️</span>
+          <span class="periodo-label">Almoço</span>
+          <span class="periodo-horario">11h – 14h</span>
+        </button>
+
+        <button class="periodo-btn jantar" type="button"
+                onclick="selecionarPeriodo(this,'Jantar')">
+          <span class="periodo-icone">🥣</span>
+          <span class="periodo-label">Jantar</span>
+          <span class="periodo-horario">17h – 19h</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- AVALIAÇÕES -->
+    <div class="avaliacoes">
+
+      <div class="bloco" id="bloco-refeicao">
+        <h3>🍽️ Qualidade da Refeição</h3>
+        <div class="faces">
+          <div class="face otimo"   onclick="selecionar(this,'refeicao','Ótima')">
+            <span class="emoji">😀</span>
+            <div class="estrelas"><span>★</span><span>★</span><span>★</span><span>★</span></div>
+            <span class="label">Ótima</span><div class="checkbox-visual">( )</div>
+          </div>
+          <div class="face bom"     onclick="selecionar(this,'refeicao','Boa')">
+            <span class="emoji">🙂</span>
+            <div class="estrelas"><span>★</span><span>★</span><span>★</span></div>
+            <span class="label">Boa</span><div class="checkbox-visual">( )</div>
+          </div>
+          <div class="face regular" onclick="selecionar(this,'refeicao','Regular')">
+            <span class="emoji">😐</span>
+            <div class="estrelas"><span>★</span><span>★</span></div>
+            <span class="label">Regular</span><div class="checkbox-visual">( )</div>
+          </div>
+          <div class="face ruim"    onclick="selecionar(this,'refeicao','Ruim')">
+            <span class="emoji">☹️</span>
+            <div class="estrelas"><span>★</span></div>
+            <span class="label">Ruim</span><div class="checkbox-visual">( )</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bloco" id="bloco-atendimento">
+        <h3>👋 Qualidade do Atendimento</h3>
+        <div class="faces">
+          <div class="face otimo"   onclick="selecionar(this,'atendimento','Ótimo')">
+            <span class="emoji">😀</span>
+            <div class="estrelas"><span>★</span><span>★</span><span>★</span><span>★</span></div>
+            <span class="label">Ótimo</span><div class="checkbox-visual">( )</div>
+          </div>
+          <div class="face bom"     onclick="selecionar(this,'atendimento','Bom')">
+            <span class="emoji">🙂</span>
+            <div class="estrelas"><span>★</span><span>★</span><span>★</span></div>
+            <span class="label">Bom</span><div class="checkbox-visual">( )</div>
+          </div>
+          <div class="face regular" onclick="selecionar(this,'atendimento','Regular')">
+            <span class="emoji">😐</span>
+            <div class="estrelas"><span>★</span><span>★</span></div>
+            <span class="label">Regular</span><div class="checkbox-visual">( )</div>
+          </div>
+          <div class="face ruim"    onclick="selecionar(this,'atendimento','Ruim')">
+            <span class="emoji">☹️</span>
+            <div class="estrelas"><span>★</span></div>
+            <span class="label">Ruim</span><div class="checkbox-visual">( )</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bloco" id="bloco-ambiente">
+        <h3>🧹 Limpeza e Organização do Ambiente</h3>
+        <div class="faces">
+          <div class="face otimo"   onclick="selecionar(this,'ambiente','Ótimo')">
+            <span class="emoji">😀</span>
+            <div class="estrelas"><span>★</span><span>★</span><span>★</span><span>★</span></div>
+            <span class="label">Ótimo</span><div class="checkbox-visual">( )</div>
+          </div>
+          <div class="face bom"     onclick="selecionar(this,'ambiente','Bom')">
+            <span class="emoji">🙂</span>
+            <div class="estrelas"><span>★</span><span>★</span><span>★</span></div>
+            <span class="label">Bom</span><div class="checkbox-visual">( )</div>
+          </div>
+          <div class="face regular" onclick="selecionar(this,'ambiente','Regular')">
+            <span class="emoji">😐</span>
+            <div class="estrelas"><span>★</span><span>★</span></div>
+            <span class="label">Regular</span><div class="checkbox-visual">( )</div>
+          </div>
+          <div class="face ruim"    onclick="selecionar(this,'ambiente','Ruim')">
+            <span class="emoji">☹️</span>
+            <div class="estrelas"><span>★</span></div>
+            <span class="label">Ruim</span><div class="checkbox-visual">( )</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- OBSERVAÇÕES -->
+    <div class="observacoes-box opcional" id="obsBox">
+      <div class="obs-cabecalho">
+        <span class="obs-label">Observações</span>
+        <span class="obs-badge opcional-badge" id="obsBadge">OPCIONAL</span>
+      </div>
+      <p class="obs-dica" id="obsDica">Tem algo a dizer? Reclamação, sugestão ou elogio.</p>
+      <textarea id="observacoes" aria-required="false"
+        placeholder="Escreva aqui (opcional)..."></textarea>
+    </div>
+
+    <!-- IDENTIFICAÇÃO -->
+    <button class="identificacao-toggle" id="btnIdentificacao"
+            type="button" onclick="toggleIdentificacao()" aria-expanded="false">
+      <span>📋 Quero me identificar (opcional)</span>
+      <span class="seta">▼</span>
+    </button>
+
+    <div class="identificacao-campos" id="camposIdentificacao">
+      <div class="campo-grupo">
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" autocomplete="name" placeholder="Seu nome">
+      </div>
+      <div class="campo-grupo">
+        <label for="telefone">Telefone</label>
+        <input type="tel" id="telefone" autocomplete="tel"
+               inputmode="numeric" placeholder="(61) 9 0000-0000">
+      </div>
+      <p class="identificacao-aviso">
+        🔒 Identificação voluntária. Protegida pela LGPD, usada apenas para retorno se necessário.
+      </p>
+    </div>
+
+    <hr class="divider-rodape" aria-hidden="true">
+    <p class="ouvidoria">Ouvidoria Geral do Distrito Federal — Disque 162</p>
+    <p class="lgpd">🔒 Dados coletados conforme a LGPD (Lei nº 13.709/2018), usados exclusivamente para melhoria do serviço.</p>
+
+    <div class="erro-msg" id="erroMsg" role="alert" aria-live="assertive"></div>
+
+    <button class="btn-enviar" id="btnEnviar" type="button" onclick="enviar()">
+      Enviar Avaliação
+    </button>
+
+  </div>
+
+  <!-- TELA DE SUCESSO -->
+  <div class="tela-sucesso" id="telaSucesso" role="status">
+    <div class="icone-wrap">
+      <span class="icone" aria-hidden="true">✅</span>
+    </div>
+    <h2>Avaliação enviada!</h2>
+    <p>Obrigado pela sua opinião.<br>Ela é essencial para melhorarmos o serviço.</p>
+    <p class="sucesso-detalhe">Sua resposta foi registrada com sucesso.</p>
+    <button class="btn-nova" type="button" onclick="novaResposta()">Nova resposta</button>
+  </div>
+
+</div>
+
+<script>
+  // ══════════════════════════════════════════
+  //  ⚠️  COLE AQUI AS CREDENCIAIS DO SUPABASE
+  // ══════════════════════════════════════════
+  const SUPABASE_URL = 'https://kosiqdzgyutdsexclzvk.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2lxZHpneXV0ZHNleGNsenZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjQyMTIsImV4cCI6MjA5MzAwMDIxMn0.Aq4ZExIo8O82eB0B2-t8Nh-NyBfCm3sb1vRhutlLOFo';
+  // ══════════════════════════════════════════
+
+  const TABELA = 'respostas';
+  const NOTAS_NEGATIVAS = ['Regular', 'Ruim'];
+  const dados = { refeicao: '', atendimento: '', ambiente: '' };
+  let periodoSelecionado = '';
+
+  function selecionarPeriodo(el, valor) {
+    document.querySelectorAll('.periodo-btn').forEach(b => b.classList.remove('selecionado'));
+    el.classList.add('selecionado');
+    periodoSelecionado = valor;
+    document.getElementById('periodoBox').classList.remove('invalido');
+  }
+
+  function selecionar(el, tipo, valor) {
+    const irmaos = el.closest('.faces').querySelectorAll('.face');
+    irmaos.forEach(f => { f.classList.remove('selecionado'); f.querySelector('.checkbox-visual').textContent = '( )'; });
+    el.classList.add('selecionado');
+    el.querySelector('.checkbox-visual').textContent = '(✓)';
+    dados[tipo] = valor;
+    el.closest('.bloco').classList.remove('bloco-invalido');
+    atualizarObservacoes();
+  }
+
+  function atualizarObservacoes() {
+    const temNeg   = Object.values(dados).some(v => NOTAS_NEGATIVAS.includes(v));
+    const obsBox   = document.getElementById('obsBox');
+    const badge    = document.getElementById('obsBadge');
+    const dica     = document.getElementById('obsDica');
+    const textarea = document.getElementById('observacoes');
+
+    if (temNeg) {
+      obsBox.classList.replace('opcional', 'atencao');
+      badge.className   = 'obs-badge obrigatorio-badge';
+      badge.textContent = 'OBRIGATÓRIO';
+      dica.textContent  = 'Você avaliou algo como Regular ou Ruim. Por favor, descreva o que aconteceu.';
+      textarea.placeholder = 'Conte o que aconteceu...';
+      textarea.setAttribute('aria-required', 'true');
+    } else {
+      obsBox.classList.replace('atencao', 'opcional');
+      badge.className   = 'obs-badge opcional-badge';
+      badge.textContent = 'OPCIONAL';
+      dica.textContent  = 'Tem algo a dizer? Reclamação, sugestão ou elogio.';
+      textarea.placeholder = 'Escreva aqui (opcional)...';
+      textarea.setAttribute('aria-required', 'false');
+    }
+  }
+
+  function toggleIdentificacao() {
+    const campos = document.getElementById('camposIdentificacao');
+    const btn    = document.getElementById('btnIdentificacao');
+    const aberto = campos.classList.toggle('visivel');
+    btn.classList.toggle('aberto', aberto);
+    btn.setAttribute('aria-expanded', aberto);
+  }
+
+  document.getElementById('telefone').addEventListener('input', function () {
+    let v = this.value.replace(/\D/g,'').slice(0,11);
+    if (v.length > 6)      v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+    else if (v.length > 2) v = `(${v.slice(0,2)}) ${v.slice(2)}`;
+    this.value = v;
+  });
+
+  async function enviar() {
+    const erroEl = document.getElementById('erroMsg');
+    const btnEl  = document.getElementById('btnEnviar');
+    erroEl.style.display = 'none';
+    document.querySelectorAll('.bloco').forEach(b => b.classList.remove('bloco-invalido'));
+
+    if (!periodoSelecionado) {
+      document.getElementById('periodoBox').classList.add('invalido');
+      erroEl.textContent   = '⚠️ Por favor, selecione qual refeição você fez.';
+      erroEl.style.display = 'block';
+      document.getElementById('periodoBox').scrollIntoView({ behavior:'smooth', block:'center' });
+      return;
+    }
+
+    const faltando = [];
+    if (!dados.refeicao)    { faltando.push('Refeição');    document.getElementById('bloco-refeicao').classList.add('bloco-invalido'); }
+    if (!dados.atendimento) { faltando.push('Atendimento'); document.getElementById('bloco-atendimento').classList.add('bloco-invalido'); }
+    if (!dados.ambiente)    { faltando.push('Ambiente');    document.getElementById('bloco-ambiente').classList.add('bloco-invalido'); }
+
+    if (faltando.length > 0) {
+      erroEl.textContent   = `⚠️ Por favor, avalie: ${faltando.join(', ')}.`;
+      erroEl.style.display = 'block';
+      document.getElementById(`bloco-${faltando[0].toLowerCase()}`).scrollIntoView({ behavior:'smooth', block:'center' });
+      return;
+    }
+
+    const obsEl  = document.getElementById('observacoes');
+    const temNeg = Object.values(dados).some(v => NOTAS_NEGATIVAS.includes(v));
+    if (temNeg && !obsEl.value.trim()) {
+      erroEl.textContent   = '⚠️ Você avaliou algo como Regular ou Ruim. Por favor, descreva no campo Observações.';
+      erroEl.style.display = 'block';
+      obsEl.focus();
+      obsEl.scrollIntoView({ behavior:'smooth', block:'center' });
+      return;
+    }
+
+    btnEl.disabled    = true;
+    btnEl.textContent = 'Enviando…';
+
+    const payload = {
+      periodo:     periodoSelecionado,
+      refeicao:    dados.refeicao,
+      atendimento: dados.atendimento,
+      ambiente:    dados.ambiente,
+      observacoes: obsEl.value.trim() || null,
+      nome:        document.getElementById('nome').value.trim()     || null,
+      telefone:    document.getElementById('telefone').value.trim() || null
+    };
+
+    try {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABELA}`, {
+        method:  'POST',
+        headers: {
+          'apikey':        SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type':  'application/json',
+          'Prefer':        'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!resp.ok) { const err = await resp.json().catch(()=>({})); throw new Error(err.message||`HTTP ${resp.status}`); }
+
+      document.getElementById('formulario').style.display  = 'none';
+      document.getElementById('telaSucesso').style.display = 'block';
+
+    } catch (e) {
+      erroEl.textContent   = '❌ Erro ao enviar. Verifique sua conexão e tente novamente.';
+      erroEl.style.display = 'block';
+      btnEl.disabled       = false;
+      btnEl.textContent    = 'Enviar Avaliação';
+    }
+  }
+
+  function novaResposta() {
+    dados.refeicao = dados.atendimento = dados.ambiente = '';
+    periodoSelecionado = '';
+    ['nome','telefone','observacoes'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('erroMsg').style.display = 'none';
+    document.querySelectorAll('.bloco').forEach(b => b.classList.remove('bloco-invalido'));
+    document.querySelectorAll('.face').forEach(f => {
+      f.classList.remove('selecionado');
+      f.querySelector('.checkbox-visual').textContent = '( )';
+    });
+    document.querySelectorAll('.periodo-btn').forEach(b => b.classList.remove('selecionado'));
+    document.getElementById('periodoBox').classList.remove('invalido');
+    document.getElementById('camposIdentificacao').classList.remove('visivel');
+    const btnId = document.getElementById('btnIdentificacao');
+    btnId.classList.remove('aberto'); btnId.setAttribute('aria-expanded','false');
+    atualizarObservacoes();
+    const btn = document.getElementById('btnEnviar');
+    btn.disabled = false; btn.textContent = 'Enviar Avaliação';
+    document.getElementById('telaSucesso').style.display = 'none';
+    document.getElementById('formulario').style.display  = 'block';
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+</script>
+</body>
+</html>
