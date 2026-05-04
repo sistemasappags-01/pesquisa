@@ -324,8 +324,8 @@
   // ═══════════════════════════════════════════════════
   //  ⚠️  COLE AQUI AS SUAS CREDENCIAIS DO SUPABASE
   // ═══════════════════════════════════════════════════
-  const SUPABASE_URL = 'https://XXXX.supabase.co';
-  const SUPABASE_KEY = 'COLE_AQUI_A_SUA_ANON_KEY';
+  const SUPABASE_URL = 'https://kosiqdzgyutdsexclzvk.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2lxZHpneXV0ZHNleGNsenZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjQyMTIsImV4cCI6MjA5MzAwMDIxMn0.Aq4ZExIo8O82eB0B2-t8Nh-NyBfCm3sb1vRhutlLOFo';
   // ═══════════════════════════════════════════════════
 
   const { createClient } = supabase;
@@ -334,7 +334,7 @@
   // Se já logado, redireciona direto para o dashboard
   (async () => {
     const { data: { session } } = await sb.auth.getSession();
-    if (session) window.location.href = 'dashboard_supabase.html';
+    if (session) window.location.href = 'dashboard.html';
   })();
 
   async function entrar() {
@@ -391,7 +391,7 @@
       return;
     }
 
-    window.location.href = 'dashboard_supabase.html';
+    window.location.href = 'dashboard.html';
   }
 
   function mostrarRecuperacao() {
@@ -451,7 +451,7 @@
     } else {
       okEl.textContent  = '✅ Senha alterada com sucesso! Redirecionando…';
       okEl.style.display = 'block';
-      setTimeout(() => window.location.href = 'dashboard_supabase.html', 2000);
+      setTimeout(() => window.location.href = 'dashboard.html', 2000);
     }
 
     btnEl.disabled    = false;
