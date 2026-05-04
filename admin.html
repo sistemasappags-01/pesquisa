@@ -111,12 +111,12 @@
 
 <!-- NAV -->
 <nav class="nav">
-  <a class="nav-logo" href="dashboard_supabase.html">
+  <a class="nav-logo" href="dashboard.html">
     <div class="nav-bar-line"></div>
     RC Sobradinho
   </a>
   <div class="nav-links">
-    <a class="nav-link" href="dashboard_supabase.html">📊 Dashboard</a>
+    <a class="nav-link" href="dashboard.html">📊 Dashboard</a>
     <a class="nav-link" href="respostas.html">📋 Respostas</a>
     <a class="nav-link ativo" href="admin.html">👥 Usuários</a>
   </div>
@@ -214,8 +214,8 @@
   // ═══════════════════════════════════════════════════
   //  ⚠️  COLE AQUI AS SUAS CREDENCIAIS DO SUPABASE
   // ═══════════════════════════════════════════════════
-  const SUPABASE_URL = 'https://XXXX.supabase.co';
-  const SUPABASE_KEY = 'COLE_AQUI_A_SUA_ANON_KEY';
+  const SUPABASE_URL = 'https://kosiqdzgyutdsexclzvk.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2lxZHpneXV0ZHNleGNsenZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjQyMTIsImV4cCI6MjA5MzAwMDIxMn0.Aq4ZExIo8O82eB0B2-t8Nh-NyBfCm3sb1vRhutlLOFo';
   // ═══════════════════════════════════════════════════
 
   const { createClient } = supabase;
@@ -243,7 +243,7 @@
     const perfil = perfilRows && perfilRows.length > 0 ? perfilRows[0] : null;
 
     if (!perfil || perfil.perfil !== 'admin') {
-      window.location.href = 'dashboard_supabase.html'; return;
+      window.location.href = 'dashboard.html'; return;
     }
 
     meuId = session.user.id;
