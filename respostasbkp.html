@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Respostas — RC Sobradinho</title>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Ctext x='16' y='22' font-size='18' text-anchor='middle'>🍽️%3C/text%3E%3C/svg%3E">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
@@ -30,8 +30,15 @@
 
     /* NAV */
     .nav{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);box-shadow:var(--shadow-sm);height:56px;display:flex;align-items:center;padding:0 24px;gap:16px;}
+    .nav-logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px;color:var(--tx1);text-decoration:none;}
     .nav-bar-line{width:3px;height:22px;background:var(--azul);border-radius:99px;}
+    .nav-links{display:flex;gap:4px;margin-left:8px;}
+    .nav-link{padding:5px 12px;border-radius:8px;font-size:13px;font-weight:500;color:var(--tx2);text-decoration:none;transition:all 0.15s;}
+    .nav-link:hover{background:var(--surface2);color:var(--tx1);}
+    .nav-link.ativo{background:var(--azul);color:#fff;}
+    .nav-link.admin-link{display:none;}
     .nav-direita{margin-left:auto;display:flex;align-items:center;gap:10px;}
+    .nav-usuario{font-size:12px;color:var(--tx3);}
     .nav-perfil-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--surface2);color:var(--tx2);border:1px solid var(--border);}
     .btn-sair{padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;font-size:12px;font-weight:600;color:var(--tx2);cursor:pointer;font-family:inherit;transition:all 0.15s;}
     .btn-sair:hover{border-color:var(--vermelho);color:var(--vermelho);}
@@ -110,10 +117,9 @@
       .btn-filtrar,.btn-exportar{grid-column:span 1;}
       .stats-row{gap:8px;}
       .stat-card{min-width:90px;}
+      .nav-links{display:none;}
     }
   </style>
-  <script>window.NAV_ATIVO = "respostas";</script>
-  <script src="js/nav.js"></script>
 </head>
 <body>
 
@@ -218,8 +224,8 @@
   // ═══════════════════════════════════════════════════
   //  ⚠️  COLE AQUI AS SUAS CREDENCIAIS DO SUPABASE
   // ═══════════════════════════════════════════════════
-  const SUPABASE_URL = '';
-  const SUPABASE_KEY = '';
+  const SUPABASE_URL = 'https://kosiqdzgyutdsexclzvk.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2lxZHpneXV0ZHNleGNsenZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjQyMTIsImV4cCI6MjA5MzAwMDIxMn0.Aq4ZExIo8O82eB0B2-t8Nh-NyBfCm3sb1vRhutlLOFo';
   // ═══════════════════════════════════════════════════
 
   const { createClient } = supabase;
