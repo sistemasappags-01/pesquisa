@@ -308,7 +308,7 @@
   // Se já logado, redireciona direto para o dashboard
   (async () => {
     const { data: { session } } = await sb.auth.getSession();
-    if (session) window.location.href = 'dashboard_supabase.html';
+    if (session) window.location.href = 'dashboard.html';
   })();
 
   async function entrar() {
@@ -374,7 +374,7 @@
       return;
     }
 
-    window.location.href = 'dashboard_supabase.html';
+    window.location.href = 'dashboard.html';
   }
 
   function mostrarRecuperacao() {
