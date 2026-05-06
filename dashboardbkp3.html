@@ -228,7 +228,16 @@
       margin-right:16px;
       cursor:default;
     }
-
+    .nav-avatar{
+      width:36px;height:36px;border-radius:50%;
+      background:linear-gradient(135deg,#0f2650,#1a3a6e);
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Sora',sans-serif;
+      font-size:13px;font-weight:700;
+      color:#fff;flex-shrink:0;
+      box-shadow:0 2px 8px rgba(26,58,110,0.25);
+      border:2px solid rgba(245,200,66,0.40);
+    }
     .nav-usuario-info{display:flex;flex-direction:column;gap:1px;}
     .nav-user-name{
       font-family:'Sora',sans-serif;
@@ -1033,17 +1042,18 @@
 
   <!-- Logo -->
   <div class="nav-logo">
-    <img src="/img/logo_sistema.svg" alt="Logo" width="36" height="36"
+    <img src="logo_sistema.svg" alt="Logo" width="36" height="36"
          style="border-radius:8px;"
          onerror="this.outerHTML='<div style='width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#0f2650,#1a3a6e);display:flex;align-items:center;justify-content:center;'><svg viewBox='0 0 32 32' width='22' height='22'><rect x='4' y='4' width='24' height='22' rx='4' fill='none' stroke='%23f5c842' stroke-width='1.8'/><circle cx='10' cy='16' r='2' fill='%23f5c842' opacity='.8'/><rect x='8' y='18.5' width='4' height='5' rx='1.2' fill='%23f5c842' opacity='.8'/><circle cx='16' cy='13' r='2.2' fill='%23f5c842'/><rect x='13.8' y='15.5' width='4.4' height='8' rx='1.2' fill='%23f5c842'/><circle cx='22' cy='10' r='2.5' fill='%23f5c842'/><rect x='19.5' y='13' width='5' height='11' rx='1.5' fill='%23f5c842'/></svg></div>'">
   </div>
 
   <!-- Usuário: avatar + nome + unidade -->
   <div class="nav-usuario">
-<div class="nav-usuario-info">
+    <div class="nav-avatar" id="nav-avatar">?</div>
+    <div class="nav-usuario-info">
       <span class="nav-user-name" id="nav-user-name">Carregando…</span>
       <div class="nav-user-sub">
-        Restaurante Comunitário de Sobradinho
+        GERSANSOB
         <span class="nav-badge" id="nav-badge"></span>
       </div>
     </div>
@@ -1432,6 +1442,14 @@
     document.getElementById('nav-user-name').textContent = perfil.nome;
     document.getElementById('nav-badge').textContent     = perfil.perfil.toUpperCase();
 
+    // Iniciais do avatar (primeira letra do nome)
+    const iniciais = perfil.nome
+      .split(' ')
+      .filter(p => p.length > 0)
+      .slice(0, 2)
+      .map(p => p[0].toUpperCase())
+      .join('');
+    document.getElementById('nav-avatar').textContent = iniciais || '?';
 
     if (perfil.perfil === 'admin') {
       document.getElementById('nav-admin-lnk').style.display = 'flex';
