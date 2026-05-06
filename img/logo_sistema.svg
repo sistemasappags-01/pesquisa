@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0f2650"/>
+      <stop offset="100%" stop-color="#1e4080"/>
+    </linearGradient>
+    <linearGradient id="barA" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%"   stop-color="#b88000"/>
+      <stop offset="100%" stop-color="#fde68a"/>
+    </linearGradient>
+    <linearGradient id="barB" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%"   stop-color="#c49600"/>
+      <stop offset="100%" stop-color="#fcd34d"/>
+    </linearGradient>
+    <linearGradient id="barC" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%"   stop-color="#d4a500"/>
+      <stop offset="100%" stop-color="#f5c842"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-8%" y="-8%" width="116%" height="124%">
+      <feDropShadow dx="0" dy="5" stdDeviation="10"
+        flood-color="#0f2650" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Fundo rounded square navy -->
+  <rect width="200" height="200" rx="40"
+    fill="url(#bgGrad)" filter="url(#cardShadow)"/>
+
+  <!-- Brilho sutil topo -->
+  <ellipse cx="100" cy="38" rx="90" ry="36"
+    fill="rgba(255,255,255,0.06)"/>
+
+  <!-- Quadrado dourado outline — elemento central -->
+  <rect x="26" y="26" width="148" height="130" rx="18"
+    fill="rgba(245,200,66,0.07)"
+    stroke="#f5c842"
+    stroke-width="5.5"/>
+
+  <!-- Pessoa 1 — menor, esquerda -->
+  <circle cx="64"  cy="98"  r="12"  fill="url(#barA)" opacity="0.78"/>
+  <rect   x="52"  y="113"  width="24" height="30" rx="7" fill="url(#barA)" opacity="0.78"/>
+
+  <!-- Pessoa 2 — média, centro -->
+  <circle cx="100" cy="82"  r="13"  fill="url(#barB)"/>
+  <rect   x="87"  y="98"   width="26" height="45" rx="7" fill="url(#barB)"/>
+
+  <!-- Pessoa 3 — maior, direita -->
+  <circle cx="137" cy="65"  r="15"  fill="url(#barC)"/>
+  <rect   x="122" y="83"   width="30" height="60" rx="8" fill="url(#barC)"/>
+
+  <!-- Linha de base dourada -->
+  <line x1="32" y1="168" x2="168" y2="168"
+    stroke="#f5c842" stroke-width="4"
+    stroke-linecap="round" opacity="0.55"/>
+</svg>

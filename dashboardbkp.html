@@ -1003,7 +1003,7 @@
 
   <!-- Links de navegação -->
   <div class="nav-links-top">
-    <a class="nav-link-top ativo" href="dashboard.html">📊 Dashboard</a>
+    <a class="nav-link-top ativo" href="dashboard_supabase.html">📊 Dashboard</a>
     <a class="nav-link-top" href="respostas.html">📋 Respostas</a>
     <a class="nav-link-top admin-lnk" id="nav-admin-lnk" href="admin.html">👥 Usuários</a>
   </div>
@@ -1309,8 +1309,8 @@
   // ══════════════════════════════════════════════════
   //  ⚠️  COLE AQUI AS SUAS CREDENCIAIS DO SUPABASE
   // ══════════════════════════════════════════════════
-  const SUPABASE_URL = 'https://kosiqdzgyutdsexclzvk.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2lxZHpneXV0ZHNleGNsenZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjQyMTIsImV4cCI6MjA5MzAwMDIxMn0.Aq4ZExIo8O82eB0B2-t8Nh-NyBfCm3sb1vRhutlLOFo';
+  const SUPABASE_URL = 'httpshttps://kosiqdzgyutdsexclzvk.supabase.co';
+  const SUPABASE_KEY = 'COLEeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2lxZHpneXV0ZHNleGNsenZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjQyMTIsImV4cCI6MjA5MzAwMDIxMn0.Aq4ZExIo8O82eB0B2-t8Nh-NyBfCm3sb1vRhutlLOFo_AQUI_A_SUA_ANON_KEY';
   // ══════════════════════════════════════════════════
 
   const { createClient } = supabase;
@@ -1320,66 +1320,27 @@
 
   // ── Auth: verifica sessão antes de carregar ────────
   async function initAuth() {
-    // Verifica se há sessão ativa
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) {
-      window.location.href = 'login.html';
-      return false;
-    }
+    if (!session) { window.location.href = 'login.html'; return false; }
 
-    const token = session.access_token;
+    const { data: { session: sessAtual } } = await sb.auth.getSession();
+    const tokenAtual = sessAtual?.access_token || SUPABASE_KEY;
 
-    // Busca o perfil com até 3 tentativas para evitar falha por latência
-    let perfil = null;
-    for (let tentativa = 1; tentativa <= 3; tentativa++) {
-      try {
-        const rows = await fetch(
-          `${SUPABASE_URL}/rest/v1/perfis?id=eq.${session.user.id}&select=*`,
-          {
-            headers: {
-              'apikey':        SUPABASE_KEY,
-              'Authorization': `Bearer ${token}`,
-              'Accept':        'application/json'
-            }
-          }
-        ).then(r => r.ok ? r.json() : []);
-
-        if (rows && rows.length > 0) {
-          perfil = rows[0];
-          break;
+    const perfilRows = await fetch(
+      `${SUPABASE_URL}/rest/v1/perfis?id=eq.${session.user.id}&select=*`,
+      {
+        headers: {
+          'apikey':        SUPABASE_KEY,
+          'Authorization': `Bearer ${tokenAtual}`,
+          'Accept':        'application/json'
         }
-      } catch (e) {
-        // aguarda 500ms antes da próxima tentativa
-        await new Promise(r => setTimeout(r, 500));
       }
-    }
+    ).then(r => r.json()).catch(() => []);
 
-    // Perfil não encontrado após 3 tentativas
-    if (!perfil) {
-      // Mostra overlay com erro em vez de fazer loop
-      const overlay = document.getElementById('overlay');
-      const msgEl   = document.getElementById('overlay-msg');
-      const btnRec  = document.getElementById('btn-recarregar');
-      overlay.classList.remove('oculto', 'erro');
-      overlay.classList.add('erro');
-      msgEl.innerHTML = `⚠️ Perfil de acesso não encontrado.<br><br>
-        Verifique se seu usuário foi registrado corretamente<br>
-        na tabela <strong>perfis</strong> do Supabase.<br><br>
-        <small style="color:#999">ID: ${session.user.id}</small>`;
-      btnRec.style.display   = 'inline-block';
-      btnRec.textContent     = '🔐 Voltar ao login';
-      btnRec.onclick         = async () => {
-        await sb.auth.signOut();
-        window.location.href = 'login.html';
-      };
-      return false;
-    }
+    const perfil = perfilRows && perfilRows.length > 0 ? perfilRows[0] : null;
 
-    // Perfil inativo
-    if (!perfil.ativo) {
-      await sb.auth.signOut();
-      window.location.href = 'login.html?erro=inativo';
-      return false;
+    if (!perfil || !perfil.ativo) {
+      await sb.auth.signOut(); window.location.href = 'login.html'; return false;
     }
 
     _perfil = perfil;
