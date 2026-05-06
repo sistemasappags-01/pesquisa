@@ -207,7 +207,6 @@
 
     .overlay.erro .spinner { display: none; }
     .overlay.erro p { color: var(--vermelho); }
-    .overlay.erro { opacity: 1 !important; pointer-events: all !important; }
 
     .btn-recarregar {
       padding: 9px 22px;
@@ -1242,8 +1241,8 @@
   // ══════════════════════════════════════════════════
   //  ⚠️  COLE AQUI AS SUAS CREDENCIAIS DO SUPABASE
   // ══════════════════════════════════════════════════
-  const SUPABASE_URL = 'https://kosiqdzgyutdsexclzvk.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2lxZHpneXV0ZHNleGNsenZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjQyMTIsImV4cCI6MjA5MzAwMDIxMn0.Aq4ZExIo8O82eB0B2-t8Nh-NyBfCm3sb1vRhutlLOFo';
+  const SUPABASE_URL = '';
+  const SUPABASE_KEY = '';
   // ══════════════════════════════════════════════════
 
   const { createClient } = supabase;
@@ -1368,10 +1367,9 @@
 
     } catch (err) {
       overlay.classList.add('erro');
-      const detalhe = err.message || 'Verifique as credenciais e as políticas RLS.';
-      msgEl.innerHTML = `❌ <strong>Não foi possível carregar os dados.</strong><br><br>
-        ${detalhe}<br><br>
-        <em style="font-size:11px;color:#999">Dica: verifique se as credenciais estão corretas e se o Supabase está ativo.</em>`;
+      msgEl.innerHTML = `❌ Não foi possível conectar ao Supabase.<br><br>
+        Verifique a URL, a chave e as políticas RLS.<br><br>
+        <em style="font-size:11px;color:#999">Erro: ${err.message}</em>`;
       btnRec.style.display = 'inline-block';
     }
     btnAtu.classList.remove('girando');
@@ -1613,29 +1611,12 @@
     new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
 
   // Inicializa auth e só então carrega dados
-  // Verifica credenciais antes de qualquer coisa
-  if (!SUPABASE_URL || SUPABASE_URL.includes('XXXX') ||
-      !SUPABASE_KEY || SUPABASE_KEY.includes('COLE')) {
-    const overlay = document.getElementById('overlay');
-    const msgEl   = document.getElementById('overlay-msg');
-    const btnRec  = document.getElementById('btn-recarregar');
-    overlay.classList.remove('oculto','erro');
-    overlay.classList.add('erro');
-    msgEl.innerHTML = `⚠️ <strong>Credenciais do Supabase não configuradas.</strong><br><br>
-      Abra o arquivo <strong>dashboard.html</strong> com o Bloco de Notas<br>
-      e substitua <em>SUPABASE_URL</em> e <em>SUPABASE_KEY</em><br>
-      pelos valores reais do seu projeto Supabase.`;
-    btnRec.style.display = 'inline-block';
-    btnRec.textContent   = '📖 Ver instruções';
-    btnRec.onclick       = () => window.open('https://supabase.com/dashboard','_blank');
-  } else {
-    initAuth().then(ok => {
-      if (ok) {
-        carregarDados();
-        setInterval(carregarDados, 5*60*1000);
-      }
-    });
-  }
+  initAuth().then(ok => {
+    if (ok) {
+      carregarDados();
+      setInterval(carregarDados, 5*60*1000);
+    }
+  });
 </script>
 </body>
 </html>
