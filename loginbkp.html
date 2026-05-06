@@ -4,35 +4,38 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login — RC Sobradinho</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Ctext x='16' y='22' font-size='18' text-anchor='middle'>🍽️%3C/text%3E%3C/svg%3E">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="favicon_sistema.svg">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --azul:       #2563eb;
-      --azul-dark:  #1d4ed8;
-      --azul-foco:  rgba(37,99,235,0.16);
-      --page-bg:    #f8fafc;
+      --azul:       #1a3a6e;
+      --azul-dark:  #0f2650;
+      --gold:        #f5c842;
+      --azul-foco:  rgba(26,58,110,0.16);
+      --page-bg:    #eef2f9;
       --surface:    #ffffff;
       --border:     #e2e8f0;
       --tx1:        #0f172a;
-      --tx2:        #64748b;
+      --tx2:        #475569;
       --tx3:        #94a3b8;
       --erro-bg:    #fff1f2;
       --erro-border:#fda4af;
       --erro-tx:    #be123c;
       --verde:      #059669;
-      --shadow:     0 4px 20px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+      --shadow:     0 4px 24px rgba(26,58,110,0.14), 0 1px 4px rgba(0,0,0,0.04);
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --azul:      #60a5fa;
-        --page-bg:   #09090b;
+        --azul:       #4a90d9;
+        --azul-dark:  #1e3a6e;
+        --gold:        #f5c842;
+        --page-bg:    #0a0f1e;
         --surface:   #18181b;
         --border:    #3f3f46;
         --tx1:       #fafafa;
-        --tx2:       #a1a1aa;
+        --tx2:        #9ca3af;
         --tx3:       #52525b;
         --erro-bg:   #1c0a0e;
         --erro-border:#9f1239;
@@ -78,7 +81,7 @@
       border-radius: 16px;
       font-size: 30px;
       margin-bottom: 14px;
-      box-shadow: 0 4px 14px rgba(37,99,235,0.30);
+      box-shadow: 0 4px 14px rgba(26,58,110,0.28);
     }
 
     .logo-titulo {
@@ -181,7 +184,7 @@
       cursor: pointer;
       margin-top: 8px;
       transition: filter 0.15s, transform 0.1s;
-      box-shadow: 0 4px 14px rgba(37,99,235,0.28);
+      box-shadow: 0 4px 14px rgba(26,58,110,0.28);
     }
 
     .btn-entrar:hover:not(:disabled)  { filter: brightness(1.08); }
@@ -203,7 +206,7 @@
       background: none;
       border: none;
       color: var(--azul);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       font-family: inherit;
       cursor: pointer;
@@ -216,16 +219,6 @@
 
     .btn-voltar:hover { text-decoration: underline; }
 
-    .link-alterar-senha {
-      display: block;
-      text-align: center;
-      font-size: 12px;
-      color: var(--tx3);
-      margin-top: 16px;
-      cursor: pointer;
-    }
-
-    .link-alterar-senha:hover { color: var(--azul); text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -235,7 +228,40 @@
   <!-- TELA DE LOGIN -->
   <div id="tela-login">
     <div class="logo-area">
-      <div class="logo-icone">🍽️</div>
+      <!-- Logo do sistema inline — sem arquivo externo -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"
+           width="80" height="80" style="margin-bottom:14px;display:block;margin-left:auto;margin-right:auto;filter:drop-shadow(0 4px 10px rgba(15,38,80,0.35))">
+        <defs>
+          <linearGradient id="lbg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0f2650"/>
+            <stop offset="100%" stop-color="#1e4080"/>
+          </linearGradient>
+          <linearGradient id="lb1" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#b88000"/>
+            <stop offset="100%" stop-color="#fde68a"/>
+          </linearGradient>
+          <linearGradient id="lb2" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#c49600"/>
+            <stop offset="100%" stop-color="#fcd34d"/>
+          </linearGradient>
+          <linearGradient id="lb3" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#d4a500"/>
+            <stop offset="100%" stop-color="#f5c842"/>
+          </linearGradient>
+        </defs>
+        <rect width="200" height="200" rx="40" fill="url(#lbg)"/>
+        <ellipse cx="100" cy="38" rx="90" ry="36" fill="rgba(255,255,255,0.06)"/>
+        <rect x="26" y="26" width="148" height="130" rx="18"
+          fill="rgba(245,200,66,0.07)" stroke="#f5c842" stroke-width="5.5"/>
+        <circle cx="64"  cy="98"  r="12" fill="url(#lb1)" opacity="0.78"/>
+        <rect   x="52"  y="113"  width="24" height="30" rx="7" fill="url(#lb1)" opacity="0.78"/>
+        <circle cx="100" cy="82"  r="13" fill="url(#lb2)"/>
+        <rect   x="87"  y="98"   width="26" height="45" rx="7" fill="url(#lb2)"/>
+        <circle cx="137" cy="65"  r="15" fill="url(#lb3)"/>
+        <rect   x="122" y="83"   width="30" height="60" rx="8" fill="url(#lb3)"/>
+        <line x1="32" y1="168" x2="168" y2="168"
+          stroke="#f5c842" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
+      </svg>
       <div class="logo-titulo">Área do Gestor</div>
       <div class="logo-subtitulo">RC Sobradinho · GDF</div>
     </div>
@@ -255,10 +281,6 @@
     </div>
 
     <button class="btn-entrar" id="btnEntrar" onclick="entrar()">Entrar</button>
-
-    <span class="link-alterar-senha" onclick="mostrarAlterar()">
-      🔑 Alterar minha senha
-    </span>
 
     <div class="rodape-card">
       Acesso restrito a gestores autorizados.<br>
@@ -290,46 +312,25 @@
     </button>
   </div>
 
-  <!-- TELA DE ALTERAR SENHA (primeiro acesso ou troca voluntária) -->
-  <div class="tela-recuperacao" id="tela-alterar">
-    <div class="logo-area" style="margin-bottom:20px">
-      <div style="font-size:36px;margin-bottom:8px">🔑</div>
-      <div class="logo-titulo" style="font-size:17px">Alterar senha</div>
-      <div class="logo-subtitulo" id="alterar-sub">Defina sua nova senha de acesso</div>
-    </div>
-
-    <div class="sucesso-msg" id="sucessoAlterar"></div>
-    <div class="erro-msg"   id="erroAlterar"></div>
-
-    <div class="form-grupo">
-      <label for="novaSenha">Nova senha</label>
-      <input type="password" id="novaSenha" placeholder="Mínimo 8 caracteres"
-             onkeydown="if(event.key==='Enter')document.getElementById('confirmaSenha').focus()">
-    </div>
-
-    <div class="form-grupo">
-      <label for="confirmaSenha">Confirmar nova senha</label>
-      <input type="password" id="confirmaSenha" placeholder="Repita a senha"
-             onkeydown="if(event.key==='Enter') alterarSenha()">
-    </div>
-
-    <button class="btn-entrar" id="btnAlterar" onclick="alterarSenha()">
-      Salvar nova senha
-    </button>
-  </div>
-
-</div>
 
 <script>
   // ═══════════════════════════════════════════════════
   //  ⚠️  COLE AQUI AS SUAS CREDENCIAIS DO SUPABASE
   // ═══════════════════════════════════════════════════
-  const SUPABASE_URL = 'https://kosiqdzgyutdsexclzvk.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2lxZHpneXV0ZHNleGNsenZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjQyMTIsImV4cCI6MjA5MzAwMDIxMn0.Aq4ZExIo8O82eB0B2-t8Nh-NyBfCm3sb1vRhutlLOFo';
+  const SUPABASE_URL = '';
+  const SUPABASE_KEY = '';
   // ═══════════════════════════════════════════════════
 
   const { createClient } = supabase;
   const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Verifica parâmetro de erro na URL (ex: ?erro=inativo)
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('erro') === 'inativo') {
+    const erroEl = document.getElementById('erroMsg');
+    erroEl.textContent  = '❌ Seu acesso está inativo. Contate o administrador.';
+    erroEl.style.display = 'block';
+  }
 
   // Se já logado, redireciona direto para o dashboard
   (async () => {
@@ -404,58 +405,6 @@
   function voltarLogin() {
     document.getElementById('tela-recuperacao').style.display = 'none';
     document.getElementById('tela-login').style.display       = 'block';
-  }
-
-  function mostrarAlterar() {
-    document.getElementById('tela-login').style.display    = 'none';
-    document.getElementById('tela-alterar').style.display  = 'block';
-  }
-
-  async function alterarSenha() {
-    const nova     = document.getElementById('novaSenha').value;
-    const confirma = document.getElementById('confirmaSenha').value;
-    const erroEl   = document.getElementById('erroAlterar');
-    const okEl     = document.getElementById('sucessoAlterar');
-    const btnEl    = document.getElementById('btnAlterar');
-    erroEl.style.display = 'none';
-    okEl.style.display   = 'none';
-
-    // Valida se está logado
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session) {
-      erroEl.textContent  = '⚠️ Você precisa estar logado. Faça login primeiro.';
-      erroEl.style.display = 'block';
-      return;
-    }
-
-    if (nova.length < 8) {
-      erroEl.textContent  = '⚠️ A senha deve ter pelo menos 8 caracteres.';
-      erroEl.style.display = 'block';
-      return;
-    }
-
-    if (nova !== confirma) {
-      erroEl.textContent  = '⚠️ As senhas não coincidem.';
-      erroEl.style.display = 'block';
-      return;
-    }
-
-    btnEl.disabled    = true;
-    btnEl.textContent = 'Salvando…';
-
-    const { error } = await sb.auth.updateUser({ password: nova });
-
-    if (error) {
-      erroEl.textContent  = `❌ ${error.message}`;
-      erroEl.style.display = 'block';
-    } else {
-      okEl.textContent  = '✅ Senha alterada com sucesso! Redirecionando…';
-      okEl.style.display = 'block';
-      setTimeout(() => window.location.href = 'dashboard.html', 2000);
-    }
-
-    btnEl.disabled    = false;
-    btnEl.textContent = 'Salvar nova senha';
   }
 
   async function recuperarSenha() {
