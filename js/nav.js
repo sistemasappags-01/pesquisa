@@ -145,7 +145,7 @@
     </div>
 
     <div class="nav-links">
-      <a class="nav-link ${ativo==='dashboard' ?'ativo':''}" href="dashboard_supabase.html">📊 Dashboard</a>
+      <a class="nav-link ${ativo==='dashboard' ?'ativo':''}" href="dashboard.html">📊 Dashboard</a>
       <a class="nav-link ${ativo==='respostas' ?'ativo':''}" href="respostas.html">📋 Respostas</a>
       <a class="nav-link admin-lnk ${ativo==='usuarios'?'ativo':''}" id="nav-admin-lnk" href="admin.html">👥 Usuários</a>
     </div>
