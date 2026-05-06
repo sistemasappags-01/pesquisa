@@ -29,6 +29,12 @@
     body{font-family:'DM Sans',system-ui,sans-serif;background:var(--page-bg);color:var(--tx1);min-height:100vh;}
 
     /* NAV */
+    .nav{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);box-shadow:var(--shadow-sm);height:56px;display:flex;align-items:center;padding:0 24px;gap:16px;}
+    .nav-bar-line{width:3px;height:22px;background:var(--azul);border-radius:99px;}
+    .nav-direita{margin-left:auto;display:flex;align-items:center;gap:10px;}
+    .nav-perfil-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--surface2);color:var(--tx2);border:1px solid var(--border);}
+    .btn-sair{padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;font-size:12px;font-weight:600;color:var(--tx2);cursor:pointer;font-family:inherit;transition:all 0.15s;}
+    .btn-sair:hover{border-color:var(--vermelho);color:var(--vermelho);}
 
     /* MAIN */
     .main{padding:24px;max-width:1400px;margin:0 auto;}
@@ -112,7 +118,22 @@
 <body>
 
 <!-- NAV -->
-
+<nav class="nav">
+  <a class="nav-logo" href="dashboard.html">
+    <div class="nav-bar-line"></div>
+    RC Sobradinho
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="dashboard.html">📊 Dashboard</a>
+    <a class="nav-link ativo" href="respostas.html">📋 Respostas</a>
+    <a class="nav-link admin-link" id="nav-admin" href="admin.html">👥 Usuários</a>
+  </div>
+  <div class="nav-direita">
+    <span class="nav-usuario" id="nav-nome"></span>
+    <span class="nav-perfil-badge" id="nav-perfil"></span>
+    <button class="btn-sair" onclick="sair()">Sair</button>
+  </div>
+</nav>
 
 <div class="main">
 
@@ -234,9 +255,8 @@
     if (!perfil || !perfil.ativo) { await sb.auth.signOut(); window.location.href = 'login.html'; return; }
 
     perfilUsuario = perfil;
-    document.getElementById('navTop').style.display = 'flex';
-    document.getElementById('nav-user-name').textContent   = perfil.nome;
-    document.getElementById('nav-badge').textContent = perfil.perfil.toUpperCase();
+    document.getElementById('nav-nome').textContent   = perfil.nome;
+    document.getElementById('nav-perfil').textContent = perfil.perfil.toUpperCase();
 
     // Mostra link admin só para admin
     if (perfil.perfil === 'admin') {
@@ -424,7 +444,7 @@
     URL.revokeObjectURL(url);
   }
 
-  document.addEventListener('DOMContentLoaded', function () { init(); });
+  init();
 </script>
 </body>
 </html>

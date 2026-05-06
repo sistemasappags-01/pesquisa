@@ -27,6 +27,12 @@
     body{font-family:'DM Sans',system-ui,sans-serif;background:var(--page-bg);color:var(--tx1);min-height:100vh;}
 
     /* NAV (igual) */
+    .nav{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);box-shadow:var(--shadow-sm);height:56px;display:flex;align-items:center;padding:0 24px;gap:16px;}
+    .nav-bar-line{width:3px;height:22px;background:var(--azul);border-radius:99px;}
+    .nav-direita{margin-left:auto;display:flex;align-items:center;gap:10px;}
+    .nav-perfil-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--surface2);color:var(--tx2);border:1px solid var(--border);}
+    .btn-sair{padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;font-size:12px;font-weight:600;color:var(--tx2);cursor:pointer;font-family:inherit;transition:all 0.15s;}
+    .btn-sair:hover{border-color:var(--vermelho);color:var(--vermelho);}
 
     .main{padding:24px;max-width:900px;margin:0 auto;}
 
@@ -99,7 +105,22 @@
 <body>
 
 <!-- NAV -->
-
+<nav class="nav">
+  <a class="nav-logo" href="dashboard.html">
+    <div class="nav-bar-line"></div>
+    RC Sobradinho
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="dashboard.html">📊 Dashboard</a>
+    <a class="nav-link" href="respostas.html">📋 Respostas</a>
+    <a class="nav-link ativo" href="admin.html">👥 Usuários</a>
+  </div>
+  <div class="nav-direita">
+    <span class="nav-usuario" id="nav-nome"></span>
+    <span class="nav-perfil-badge">ADMIN</span>
+    <button class="btn-sair" onclick="sair()">Sair</button>
+  </div>
+</nav>
 
 <div class="main">
 
@@ -221,8 +242,7 @@
     }
 
     meuId = session.user.id;
-    document.getElementById('navTop').style.display = 'flex';
-    document.getElementById('nav-user-name').textContent = perfil.nome;
+    document.getElementById('nav-nome').textContent = perfil.nome;
     carregarUsuarios();
   }
 
@@ -413,11 +433,8 @@
     });
 
     fecharModal();
-  document.addEventListener('DOMContentLoaded', async function () {
     carregarUsuarios();
   }
-  });
-
 
   // Fechar modal clicando fora
   document.getElementById('modalOverlay').addEventListener('click', function(e) {
