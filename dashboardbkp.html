@@ -193,7 +193,7 @@
     /* ═══════════════════════════════════════════════════
        NAV — barra de navegação (protegida)
     ═══════════════════════════════════════════════════ */
-    
+    /* nav via nav.js */
 
     /* separador */
     .nav-sep{width:1px;height:22px;background:var(--border);flex-shrink:0;}
@@ -943,6 +943,8 @@
     .filtros-container { gap: 6px; }
     }
   </style>
+  <script>window.NAV_ATIVO = "dashboard";</script>
+  <script src="js/nav.js"></script>
 </head>
 <body>
 
@@ -1009,7 +1011,7 @@
           <div class="kpi-valor" id="kpi-positivo">—</div>
           <div class="kpi-label">Ótimo + Bom</div>
         </div>
-        <div class="kpi-icone">😁</div>
+        <div class="kpi-icone">😀</div>
       </div>
       <div class="kpi-sub"      id="kpi-positivo-pct">—</div>
       <div class="kpi-variacao" id="kpi-positivo-var"></div>
@@ -1235,15 +1237,12 @@
 
 </div><!-- /main -->
 
-
-  <script>window.NAV_ATIVO = "dashboard";</script>
-  <script src="js/nav.js"></script>
-  <script>
+<script>
   // ══════════════════════════════════════════════════
   //  ⚠️  COLE AQUI AS SUAS CREDENCIAIS DO SUPABASE
   // ══════════════════════════════════════════════════
-  const SUPABASE_URL = 'https://kosiqdzgyutdsexclzvk.supabase.co'; // ← substitua pela sua URL
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2lxZHpneXV0ZHNleGNsenZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjQyMTIsImV4cCI6MjA5MzAwMDIxMn0.Aq4ZExIo8O82eB0B2-t8Nh-NyBfCm3sb1vRhutlLOFo'; // ← substitua pela sua anon key
+  const SUPABASE_URL = 'https://kosiqdzgyutdsexclzvk.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2lxZHpneXV0ZHNleGNsenZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjQyMTIsImV4cCI6MjA5MzAwMDIxMn0.Aq4ZExIo8O82eB0B2-t8Nh-NyBfCm3sb1vRhutlLOFo';
   // ══════════════════════════════════════════════════
 
   const { createClient } = supabase;
@@ -1609,14 +1608,18 @@
   }
 
   // Aguarda o DOM completo — nav.js precisa do body para injetar a nav
-  document.getElementById('data-atual').textContent =
-    new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  document.addEventListener('DOMContentLoaded', function () {
 
-  initAuth().then(ok => {
-    if (ok) {
-      carregarDados();
-      setInterval(carregarDados, 5*60*1000);
-    }
+    document.getElementById('data-atual').textContent =
+      new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+
+    initAuth().then(ok => {
+      if (ok) {
+        carregarDados();
+        setInterval(carregarDados, 5*60*1000);
+      }
+    });
+
   });
 </script>
 </body>
