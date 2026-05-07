@@ -5,7 +5,7 @@
 //  antes de incluir este script
 // ═══════════════════════════════════════════════════════════
 
-(function () {
+document.addEventListener('DOMContentLoaded', function () {
 
   // ── Logo SVG inline ──────────────────────────────────────
   const LOGO_SVG = `
@@ -156,7 +156,7 @@
 
   </nav>`;
 
-  // Injeta no topo do body
+  // Injeta no topo do body — DOM garantidamente pronto
   document.body.insertAdjacentHTML('afterbegin', HTML);
 
-})();
+});

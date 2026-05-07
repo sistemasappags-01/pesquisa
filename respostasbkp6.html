@@ -29,19 +29,6 @@
     body{font-family:'DM Sans',system-ui,sans-serif;background:var(--page-bg);color:var(--tx1);min-height:100vh;}
 
     /* NAV */
-    
-    
-    
-    
-    
-    
-    
-    .nav-link.admin-link{display:none;}
-    
-    
-    
-    
-    
 
     /* MAIN */
     .main{padding:24px;max-width:1400px;margin:0 auto;}
@@ -117,9 +104,10 @@
       .btn-filtrar,.btn-exportar{grid-column:span 1;}
       .stats-row{gap:8px;}
       .stat-card{min-width:90px;}
-      
     }
   </style>
+  <script>window.NAV_ATIVO = "respostas";</script>
+  <script src="js/nav.js"></script>
 </head>
 <body>
 
@@ -205,15 +193,12 @@
 
 </div>
 
-
-  <script>window.NAV_ATIVO = "respostas";</script>
-  <script src="js/nav.js"></script>
-  <script>
+<script>
   // ═══════════════════════════════════════════════════
   //  ⚠️  COLE AQUI AS SUAS CREDENCIAIS DO SUPABASE
   // ═══════════════════════════════════════════════════
-  const SUPABASE_URL = 'https://kosiqdzgyutdsexclzvk.supabase.co'; // ← substitua pela sua URL
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2lxZHpneXV0ZHNleGNsenZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjQyMTIsImV4cCI6MjA5MzAwMDIxMn0.Aq4ZExIo8O82eB0B2-t8Nh-NyBfCm3sb1vRhutlLOFo'; // ← substitua pela sua anon key
+  const SUPABASE_URL = 'https://kosiqdzgyutdsexclzvk.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2lxZHpneXV0ZHNleGNsenZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjQyMTIsImV4cCI6MjA5MzAwMDIxMn0.Aq4ZExIo8O82eB0B2-t8Nh-NyBfCm3sb1vRhutlLOFo';
   // ═══════════════════════════════════════════════════
 
   const { createClient } = supabase;
@@ -255,7 +240,7 @@
 
     // Mostra link admin só para admin
     if (perfil.perfil === 'admin') {
-      document.getElementById('nav-admin-lnk').style.display = 'flex';
+      document.getElementById('nav-admin').style.display = 'flex';
     }
 
     // Visualizador não vê dados pessoais
@@ -439,7 +424,7 @@
     URL.revokeObjectURL(url);
   }
 
-  init();
+  document.addEventListener('DOMContentLoaded', function () { init(); });
 </script>
 </body>
 </html>
