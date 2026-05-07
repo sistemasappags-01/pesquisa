@@ -93,6 +93,7 @@
       .form-grid{grid-template-columns:1fr 1fr;}
     }
   </style>
+
   <script>window.NAV_ATIVO = "usuarios";</script>
   <script src="js/nav.js"></script>
 </head>
@@ -413,18 +414,15 @@
     });
 
     fecharModal();
-  document.addEventListener('DOMContentLoaded', async function () {
     carregarUsuarios();
   }
-  });
-
 
   // Fechar modal clicando fora
   document.getElementById('modalOverlay').addEventListener('click', function(e) {
     if (e.target === this) fecharModal();
   });
 
-  init();
+  document.addEventListener('DOMContentLoaded', function () { init(); });
 </script>
 </body>
 </html>
