@@ -323,10 +323,7 @@
   }
 
   function atualizarStats(dados) {
-    // Conta apenas campos efetivamente preenchidos (não nulos)
-    const totalAv = dados.reduce((a,d) =>
-      a + [d.refeicao, d.atendimento, d.ambiente].filter(n => n && n !== 'null').length, 0
-    );
+    const totalAv = dados.length * 3;
     const pos = dados.reduce((a,d)=>a+[d.refeicao,d.atendimento,d.ambiente]
       .filter(n=>['Ótima','Ótimo','Boa','Bom'].includes(n)).length, 0);
     const neg = dados.reduce((a,d)=>a+[d.refeicao,d.atendimento,d.ambiente]
@@ -362,9 +359,9 @@
       return `<tr>
         <td class="td-data">${fmt}</td>
         <td>${r.periodo ? `<span class="periodo-badge ${periodoCss[r.periodo]||''}">${r.periodo}</span>` : '—'}</td>
-        <td>${r.refeicao    ? `<span class="nota-badge ${classeNota(r.refeicao)}">${r.refeicao}</span>`       : '<em style="color:var(--tx3)">—</em>'}</td>
-        <td>${r.atendimento ? `<span class="nota-badge ${classeNota(r.atendimento)}">${r.atendimento}</span>` : '<em style="color:var(--tx3)">—</em>'}</td>
-        <td>${r.ambiente    ? `<span class="nota-badge ${classeNota(r.ambiente)}">${r.ambiente}</span>`       : '<em style="color:var(--tx3)">—</em>'}</td>
+        <td><span class="nota-badge ${classeNota(r.refeicao)}">${r.refeicao||'—'}</span></td>
+        <td><span class="nota-badge ${classeNota(r.atendimento)}">${r.atendimento||'—'}</span></td>
+        <td><span class="nota-badge ${classeNota(r.ambiente)}">${r.ambiente||'—'}</span></td>
         <td class="td-pessoal col-pessoal" ${ocultaPessoal?'style="display:none"':''}>
           ${ocultaPessoal
             ? '<span class="oculto">Oculto</span>'
@@ -409,7 +406,6 @@
   }
 
   function classeNota(n) {
-    if (!n || n === 'null') return '';
     if(['Ótima','Ótimo'].includes(n)) return 'otimo';
     if(['Boa','Bom'].includes(n))     return 'bom';
     if(n==='Regular')                 return 'regular';
