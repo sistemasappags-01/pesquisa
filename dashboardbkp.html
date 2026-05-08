@@ -1414,19 +1414,13 @@
   function cnt(dados, campo, notas) { return dados.filter(d=>notas.includes(d[campo])).length; }
 
   function calcScore(dados) {
-    // Ignora campos não preenchidos (null/undefined) — não conta como Ruim
-    const s = dados.flatMap(d =>
-      [d.refeicao, d.atendimento, d.ambiente].filter(n => n)
-    ).map(scoreNota);
+    const s = dados.flatMap(d=>[d.refeicao,d.atendimento,d.ambiente].map(scoreNota));
     return s.length ? Math.round(s.reduce((a,b)=>a+b,0)/s.length) : null;
   }
 
   function renderizar(dados) {
     const total   = dados.length;
-    // Conta apenas avaliações efetivamente preenchidas (campos opcionais)
-    const totalAv = dados.reduce((a,d) =>
-      a + [d.refeicao, d.atendimento, d.ambiente].filter(n => n).length, 0
-    );
+    const totalAv = total * 3;
     const hoje    = new Date();
 
     const totalPos  = dados.reduce((a,d)=>a+[d.refeicao,d.atendimento,d.ambiente].filter(n=>['Ótima','Ótimo','Boa','Bom'].includes(n)).length,0);
@@ -1517,10 +1511,7 @@
       // circunferência = 2π×36 ≈ 226
       const offset = 226 - (226 * val / 100);
       // Contagem correta: por avaliação individual (3 por resposta)
-      // Conta apenas avaliações preenchidas por período
-      const totalAvals = dp.reduce((a,d) =>
-        a + [d.refeicao, d.atendimento, d.ambiente].filter(n => n).length, 0
-      );
+      const totalAvals = dp.length * 3;
       const nPos = dp.reduce((a,d) => a +
         [d.refeicao,d.atendimento,d.ambiente]
           .filter(n => ['Ótima','Ótimo','Boa','Bom'].includes(n)).length, 0);
