@@ -612,7 +612,7 @@
             stroke-dasharray="113" stroke-dashoffset="0"
             id="contagem-arco" style="transition:stroke-dashoffset 1s linear;transform:rotate(-90deg);transform-origin:50% 50%"/>
         </svg>
-        <span class="contagem-num" id="contagem-num">4</span>
+        <span class="contagem-num" id="contagem-num">6</span>
       </div>
       <p class="contagem-txt">Nova pesquisa em <strong id="contagem-seg">4</strong>s</p>
     </div>
@@ -728,9 +728,9 @@
 
     const payload = {
       periodo:     periodoSelecionado,
-      refeicao:    dados.refeicao,
-      atendimento: dados.atendimento,
-      ambiente:    dados.ambiente,
+      refeicao:    dados.refeicao    || null,  // envia null se não preenchido
+      atendimento: dados.atendimento || null,  // envia null se não preenchido
+      ambiente:    dados.ambiente    || null,  // envia null se não preenchido
       observacoes: obsEl.value.trim() || null,
       nome:        document.getElementById('nome').value.trim()     || null,
       telefone:    document.getElementById('telefone').value.trim() || null
@@ -763,7 +763,7 @@
   }
 
   function iniciarContagem() {
-    let seg = 4;
+    let seg = 6;
     const numEl  = document.getElementById('contagem-num');
     const segEl  = document.getElementById('contagem-seg');
     const arco   = document.getElementById('contagem-arco');
