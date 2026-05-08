@@ -1402,7 +1402,6 @@
   }
 
   function classeNota(n) {
-    if (!n || n === 'null') return '';
     if(['Ótima','Ótimo'].includes(n)) return 'otimo';
     if(['Boa','Bom'].includes(n))     return 'bom';
     if(n==='Regular')                 return 'regular';
@@ -1415,16 +1414,18 @@
   function cnt(dados, campo, notas) { return dados.filter(d=>notas.includes(d[campo])).length; }
 
   function calcScore(dados) {
+    // Ignora campos não preenchidos (null/undefined) — não conta como Ruim
     const s = dados.flatMap(d =>
-      [d.refeicao, d.atendimento, d.ambiente].filter(n => n && n !== 'null')
+      [d.refeicao, d.atendimento, d.ambiente].filter(n => n)
     ).map(scoreNota);
     return s.length ? Math.round(s.reduce((a,b)=>a+b,0)/s.length) : null;
   }
 
   function renderizar(dados) {
     const total   = dados.length;
+    // Conta apenas avaliações efetivamente preenchidas (campos opcionais)
     const totalAv = dados.reduce((a,d) =>
-      a + [d.refeicao, d.atendimento, d.ambiente].filter(n => n && n !== 'null').length, 0
+      a + [d.refeicao, d.atendimento, d.ambiente].filter(n => n).length, 0
     );
     const hoje    = new Date();
 
@@ -1516,8 +1517,9 @@
       // circunferência = 2π×36 ≈ 226
       const offset = 226 - (226 * val / 100);
       // Contagem correta: por avaliação individual (3 por resposta)
+      // Conta apenas avaliações preenchidas por período
       const totalAvals = dp.reduce((a,d) =>
-        a + [d.refeicao, d.atendimento, d.ambiente].filter(n => n && n !== 'null').length, 0
+        a + [d.refeicao, d.atendimento, d.ambiente].filter(n => n).length, 0
       );
       const nPos = dp.reduce((a,d) => a +
         [d.refeicao,d.atendimento,d.ambiente]
@@ -1608,9 +1610,9 @@
       <tr>
         <td class="data-cell">${fmtData(r.dataHora)}</td>
         <td>${r.periodo?`<span class="periodo-badge ${periodoCss[r.periodo]||'almoco'}">${r.periodo}</span>`:'—'}</td>
-        <td>${r.refeicao    ? `<span class="nota-badge ${classeNota(r.refeicao)}">${r.refeicao}</span>`       : '<em style="color:var(--tx3)">—</em>'}</td>
-        <td>${r.atendimento ? `<span class="nota-badge ${classeNota(r.atendimento)}">${r.atendimento}</span>` : '<em style="color:var(--tx3)">—</em>'}</td>
-        <td>${r.ambiente    ? `<span class="nota-badge ${classeNota(r.ambiente)}">${r.ambiente}</span>`       : '<em style="color:var(--tx3)">—</em>'}</td>
+        <td><span class="nota-badge ${classeNota(r.refeicao)}">${r.refeicao}</span></td>
+        <td><span class="nota-badge ${classeNota(r.atendimento)}">${r.atendimento}</span></td>
+        <td><span class="nota-badge ${classeNota(r.ambiente)}">${r.ambiente}</span></td>
         <td class="obs-cell">${r.observacoes||'<em style="color:var(--tx3)">—</em>'}</td>
       </tr>`).join('');
   }
