@@ -226,7 +226,7 @@
 
     <!-- Logo GDF -->
     <div class="nav-logo">
-      <img src="logo_gdf.jpg" alt="GDF"
+      <img src="/img/logo_gdf.jpg" alt="GDF"
            onerror="this.style.display='none'">
     </div>
 
