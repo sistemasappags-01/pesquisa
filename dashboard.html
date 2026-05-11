@@ -4,1629 +4,1149 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard — RC Sobradinho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="favicon_sistema.svg">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231a3a6e'/%3E%3Ctext x='16' y='22' font-size='18' text-anchor='middle'%3E🍽️%3C/text%3E%3C/svg%3E">
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    /* ═══════════════════════════════════════════════════
-       TEMA CLARO
-    ═══════════════════════════════════════════════════ */
     :root {
-      /* Institucionais — paleta folder */
-      --azul:        #1a3a6e;
-      --azul-hover:  #0f2650;
-      --azul-foco:   rgba(26,58,110,0.16);
-      --gold:        #f5c842;
-      --gold-dark:   #d4a500;
-
-      /* Semânticas — satisfação */
-      --verde:       #059669;   /* emerald-600 */
-      --bom:         #10b981;   /* emerald-500 */
-      --amarelo:     #d97706;   /* amber-600   */
-      --vermelho:    #e11d48;   /* rose-600    */
-
-      /* Barras empilhadas */
-      --bar-otimo:   #059669;
-      --bar-bom:     #34d399;
-      --bar-regular: #fbbf24;
-      --bar-ruim:    #fb7185;
-
-      /* Refeições — identidade moderna */
-      --cafe:        #ea580c;   /* orange-600  */
-      --cafe-light:  #fff7ed;
-      --cafe-ring:   rgba(234,88,12,0.10);
-      --almoco:      #0891b2;   /* cyan-600    */
-      --almoco-light:#ecfeff;
-      --almoco-ring: rgba(8,145,178,0.10);
-      --jantar:      #7c3aed;   /* violet-600  */
-      --jantar-light:#f5f3ff;
-      --jantar-ring: rgba(124,58,237,0.10);
-
-      /* KPI backgrounds */
-      --kpi-azul-bg:     rgba(26,58,110,0.06);
-      --kpi-verde-bg:    rgba(5,150,105,0.06);
-      --kpi-amarelo-bg:  rgba(217,119,6,0.06);
-      --kpi-vermelho-bg: rgba(225,29,72,0.06);
-
-      /* Superfícies */
-      --page-bg:     #eef2f9;
-      --surface:     #ffffff;
-      --surface2:    #f1f5f9;
-      --border:      #e2e8f0;
-      --border-strong:#cbd5e1;
-
-      /* Texto */
-      --tx1:  #0f172a;
-      --tx2:  #64748b;
-      --tx3:  #94a3b8;
-
-      /* Sombras */
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-      --shadow-md: 0 4px 16px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.04);
-      --shadow-lg: 0 12px 28px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06);
+      --navy:     #1a3a6e;
+      --navy-d:   #0f2650;
+      --azul:     #2a5298;
+      --gold:     #f5c842;
+      --verde:    #059669;
+      --verde2:   #10b981;
+      --amarelo:  #d97706;
+      --vermelho: #e11d48;
+      --roxo:     #7c3aed;
+      --page:     #eef2f9;
+      --surface:  #ffffff;
+      --border:   #e2e8f0;
+      --tx1:      #0f172a;
+      --tx2:      #475569;
+      --tx3:      #94a3b8;
+      --shadow:   0 2px 10px rgba(26,58,110,0.09);
+      --shadow-lg:0 4px 24px rgba(26,58,110,0.13);
+      --radius:   12px;
     }
-
-    /* ═══════════════════════════════════════════════════
-       TEMA ESCURO
-    ═══════════════════════════════════════════════════ */
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --azul:        #4a90d9;
-        --azul-hover:  #5ba0e8;
-        --azul-foco:   rgba(74,144,217,0.18);
-        --gold:        #f5c842;
-        --gold-dark:   #d4a500;
-
-        --verde:       #34d399;
-        --bom:         #6ee7b7;
-        --amarelo:     #fbbf24;
-        --vermelho:    #fb7185;
-
-        --bar-otimo:   #34d399;
-        --bar-bom:     #6ee7b7;
-        --bar-regular: #fbbf24;
-        --bar-ruim:    #fb7185;
-
-        --cafe:        #fb923c;
-        --cafe-light:  #1c0f06;
-        --cafe-ring:   rgba(251,146,60,0.15);
-        --almoco:      #22d3ee;
-        --almoco-light:#061b1e;
-        --almoco-ring: rgba(34,211,238,0.15);
-        --jantar:      #a78bfa;
-        --jantar-light:#130f2a;
-        --jantar-ring: rgba(167,139,250,0.15);
-
-        --kpi-azul-bg:     rgba(96,165,250,0.08);
-        --kpi-verde-bg:    rgba(74,222,128,0.08);
-        --kpi-amarelo-bg:  rgba(251,191,36,0.08);
-        --kpi-vermelho-bg: rgba(248,113,113,0.08);
-
-        --page-bg:     #09090b;
-        --surface:     #18181b;
-        --surface2:    #27272a;
-        --border:      #3f3f46;
-        --border-strong:#71717a;
-
-        --tx1:  #fafafa;
-        --tx2:  #a1a1aa;
-        --tx3:  #52525b;
-
-        --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-        --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-        --shadow-lg: 0 12px 28px rgba(0,0,0,0.5);
+    @media(prefers-color-scheme:dark){
+      :root{
+        --page:#0a0f1e; --surface:#111827; --border:#1f2937;
+        --tx1:#f9fafb; --tx2:#9ca3af; --tx3:#6b7280;
       }
     }
-
-    /* p-stat-mini e stat-items no dark mode */
-    @media (prefers-color-scheme: dark) {
-      .p-stat-mini.pos {
-        background: rgba(52,211,153,0.10);
-        border-color: rgba(52,211,153,0.22);
-      }
-      .p-stat-mini.pos .p-stat-val,
-      .p-stat-mini.pos .p-stat-lbl { color: #34d399; }
-
-      .p-stat-mini.neg {
-        background: rgba(251,113,133,0.10);
-        border-color: rgba(251,113,133,0.22);
-      }
-      .p-stat-mini.neg .p-stat-val,
-      .p-stat-mini.neg .p-stat-lbl { color: #fb7185; }
-
-      .p-stat-mini.tot .p-stat-val { color: var(--tx1); }
-      .stat-item.otimo   { background: rgba(52,211,153,0.10); border-color: rgba(52,211,153,0.20); }
-      .stat-item.bom     { background: rgba(110,231,183,0.10);border-color: rgba(110,231,183,0.20);}
-      .stat-item.regular { background: rgba(251,191,36,0.10); border-color: rgba(251,191,36,0.22); }
-      .stat-item.ruim    { background: rgba(251,113,133,0.10);border-color: rgba(251,113,133,0.20);}
-
-      .stat-item.otimo   .stat-nota,
-      .stat-item.otimo   .stat-pct   { color: #34d399; }
-      .stat-item.bom     .stat-nota,
-      .stat-item.bom     .stat-pct   { color: #6ee7b7; }
-      .stat-item.regular .stat-nota,
-      .stat-item.regular .stat-pct   { color: #fbbf24; }
-      .stat-item.ruim    .stat-nota,
-      .stat-item.ruim    .stat-pct   { color: #fb7185; }
-    }
-
-    /* ═══════════════════════════════════════════════════
-       RESET & BASE
-    ═══════════════════════════════════════════════════ */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'DM Sans', system-ui, sans-serif;
-      background: var(--page-bg);
-      color: var(--tx1);
-      min-height: 100vh;
-      font-size: 14px;
-      line-height: 1.5;
-      transition: background 0.3s, color 0.3s;
-    }
-
-    /* ═══════════════════════════════════════════════════
-       OVERLAY
-    ═══════════════════════════════════════════════════ */
-    .overlay {
-      position: fixed; inset: 0;
-      background: var(--page-bg);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 16px; z-index: 999;
-      transition: opacity 0.4s;
-    }
-
-    .overlay.oculto { opacity: 0; pointer-events: none; }
-
-    .spinner {
-      width: 40px; height: 40px;
-      border: 3px solid var(--border);
-      border-top-color: var(--azul);
-      border-radius: 50%;
-      animation: spin 0.75s linear infinite;
-    }
-
-
-    /* ═══════════════════════════════════════════════════
-       NAV — barra de navegação (protegida)
-    ═══════════════════════════════════════════════════ */
-    
-
-    /* separador */
-    .nav-sep{width:1px;height:22px;background:var(--border);flex-shrink:0;}
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .overlay p {
-      font-size: 14px; color: var(--tx2); font-weight: 500;
-      text-align: center; max-width: 360px; line-height: 1.6;
-    }
-
-    .overlay.erro .spinner { display: none; }
-    .overlay.erro p { color: var(--vermelho); }
-
-    .btn-recarregar {
-      padding: 9px 22px;
-      background: var(--azul); color: #fff;
-      border: none; border-radius: 8px;
-      font-size: 13px; font-weight: 600; font-family: inherit;
-      cursor: pointer; transition: filter 0.15s;
-    }
-
-    .btn-recarregar:hover { filter: brightness(1.12); }
-
-    /* header removido — unificado na nav-top */
-
-    /* ═══════════════════════════════════════════════════
-       CONTEÚDO PRINCIPAL
-    ═══════════════════════════════════════════════════ */
-    .main { padding: 20px 24px 24px; max-width: 1400px; margin: 0 auto; }
-
-    /* ═══════════════════════════════════════════════════
-       BARRA DE FILTROS — contida, pill-style
-    ═══════════════════════════════════════════════════ */
-    /* ── BARRA DE ATUALIZAÇÃO ── */
-    .atualizacao-bar {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .atualizacao-texto {
-      font-size: 11.5px;
-      color: var(--tx3);
-      font-family: 'DM Mono', monospace;
-    }
-
-    .btn-atualizar {
-      display: flex; align-items: center; gap: 5px;
-      padding: 5px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      font-size: 12px; font-family: inherit; font-weight: 600;
-      color: var(--tx2); cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .btn-atualizar:hover { border-color: var(--azul); color: var(--azul); }
-    .btn-atualizar.girando .icone-refresh {
-      animation: spin 0.75s linear infinite;
-      display: inline-block;
-    }
-
-    .filtros-container {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 16px;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .filtros-grupo {
-      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-    }
-
-    .filtros-label {
-      font-size: 11px; font-weight: 600;
-      color: var(--tx3); text-transform: uppercase;
-      letter-spacing: 0.6px; white-space: nowrap;
-      margin-right: 2px;
-    }
-
-    .filtro-btn {
-      padding: 5px 14px;
-      border-radius: 99px;   /* pill */
-      border: 1px solid var(--border);
-      background: transparent;
-      font-size: 12px; font-family: inherit; font-weight: 500;
-      color: var(--tx2); cursor: pointer;
-      transition: all 0.15s;
-      white-space: nowrap;
-    }
-
-    .filtro-btn:hover:not(.ativo) { border-color: var(--azul); color: var(--azul); }
-    .filtro-btn.ativo { background: var(--azul); border-color: var(--azul); color: #fff; font-weight: 600; }
-
-    .filtro-btn.cafe.ativo   { background: var(--cafe);   border-color: var(--cafe); }
-    .filtro-btn.almoco.ativo { background: var(--almoco); border-color: var(--almoco); }
-    .filtro-btn.jantar.ativo { background: var(--jantar); border-color: var(--jantar); }
-
-    .filtro-sep {
-      width: 1px; height: 20px;
-      background: var(--border); margin: 0 6px;
-    }
-
-    /* ═══════════════════════════════════════════════════
-       GRID LAYOUTS
-    ═══════════════════════════════════════════════════ */
-    .grid-kpis {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px; margin-bottom: 16px;
-    }
-
-    .grid-full  { margin-bottom: 16px; }
-    .grid-2     { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    .grid-barras { display: grid; grid-template-columns: 3fr 1.6fr; gap: 16px; margin-bottom: 16px; }
-    .grid-atencao { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-
-    /* ═══════════════════════════════════════════════════
-       KPI CARDS — fundo colorido
-    ═══════════════════════════════════════════════════ */
-    .kpi {
-      border-radius: 14px;
-      padding: 18px 18px 16px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
-      position: relative;
-      overflow: hidden;
-      transition: box-shadow 0.2s, transform 0.2s, background 0.3s;
-      cursor: default;
-    }
-
-    .kpi:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-2px);
-    }
-
-    /* fundo colorido por tipo */
-    .kpi.azul    { background: var(--kpi-azul-bg); }
-    .kpi.verde   { background: var(--kpi-verde-bg); }
-    .kpi.amarelo { background: var(--kpi-amarelo-bg); }
-    .kpi.vermelho{ background: var(--kpi-vermelho-bg); }
-
-    /* linha decorativa esquerda */
-    .kpi::before {
-      content: '';
-      position: absolute; top: 0; left: 0; bottom: 0;
-      width: 3px; border-radius: 14px 0 0 14px;
-    }
-
-    .kpi.azul::before    { background: var(--azul); }
-    .kpi.verde::before   { background: var(--verde); }
-    .kpi.amarelo::before { background: var(--amarelo); }
-    .kpi.vermelho::before{ background: var(--vermelho); }
-
-    .kpi-topo {
-      display: flex; align-items: flex-start;
-      justify-content: space-between; margin-bottom: 10px;
-    }
-
-    .kpi-icone {
-      font-size: 20px; line-height: 1;
-      width: 38px; height: 38px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 10px;
-      background: var(--surface);
-    }
-
-    .kpi-valor {
-      font-size: 32px; font-weight: 700; line-height: 1;
-      font-family: 'Sora', monospace;
-      margin-bottom: 4px;
-    }
-
-    .kpi.azul    .kpi-valor { color: var(--azul); }
-    .kpi.verde   .kpi-valor { color: var(--verde); }
-    .kpi.amarelo .kpi-valor { color: var(--amarelo); }
-    .kpi.vermelho .kpi-valor{ color: var(--vermelho); }
-
-    .kpi-label {
-      font-size: 11px; font-weight: 600;
-      color: var(--tx2); text-transform: uppercase; letter-spacing: 0.5px;
-    }
-
-    .kpi-sub { font-size: 11px; color: var(--tx3); margin-top: 3px; }
-
-    .kpi-variacao {
-      font-size: 11px; font-weight: 600; margin-top: 5px;
-      display: inline-flex; align-items: center; gap: 3px;
-      padding: 2px 7px; border-radius: 99px;
-    }
-
-    .kpi-variacao.sobe   { background: rgba(22,101,52,0.10); color: var(--verde); }
-    .kpi-variacao.desce  { background: rgba(153,27,27,0.10); color: var(--vermelho); }
-    .kpi-variacao.neutro {
-      background: var(--surface2);
-      color: var(--tx3);
-      font-style: italic;
-      font-weight: 500;
-      letter-spacing: 0;
-      cursor: help;   /* indica que tem tooltip */
-    }
-
-    /* ═══════════════════════════════════════════════════
-       CARDS GERAIS
-    ═══════════════════════════════════════════════════ */
-    .card {
-      background: var(--surface);
-      border-radius: 14px;
-      padding: 20px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
-      transition: box-shadow 0.2s, transform 0.2s, background 0.3s;
-    }
-
-    .card:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-1px);
-    }
-
-    /* título com linha lateral colorida */
-    .card-titulo {
-      font-size: 11px; font-weight: 700;
-      color: var(--tx2); text-transform: uppercase;
-      letter-spacing: 0.6px; margin-bottom: 18px;
-      display: flex; align-items: center; gap: 8px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .card-titulo::before {
-      content: '';
-      display: inline-block;
-      width: 3px; height: 14px;
-      background: var(--azul);
-      border-radius: 99px;
-      flex-shrink: 0;
-    }
-
-    /* ═══════════════════════════════════════════════════
-       BARRAS DE SATISFAÇÃO
-    ═══════════════════════════════════════════════════ */
-    .barra-grupo { margin-bottom: 20px; }
-    .barra-grupo:last-child { margin-bottom: 0; }
-
-    .barra-header {
-      display: flex; justify-content: space-between;
-      align-items: center; margin-bottom: 8px;
-    }
-
-    .barra-nome { font-size: 13px; font-weight: 600; color: var(--tx1); }
-    .barra-pct  { font-size: 12px; font-family: 'DM Mono', monospace; color: var(--tx2); font-weight: 500; }
-
-    .barra-track {
-      height: 10px; background: var(--surface2);
-      border-radius: 99px; overflow: hidden; display: flex; gap: 1px;
-    }
-
-    .barra-seg {
-      height: 100%; border-radius: 99px;
-      transition: width 0.9s cubic-bezier(0.34,1.56,0.64,1);
-    }
-
-    .barra-legend {
-      display: flex; gap: 14px; margin-top: 14px; flex-wrap: wrap;
-    }
-
-    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--tx2); }
-    .legend-dot  { width: 8px; height: 8px; border-radius: 3px; flex-shrink: 0; }
-
-    /* ═══════════════════════════════════════════════════
-       SCORE — anel + badge textual
-    ═══════════════════════════════════════════════════ */
-    .score-container {
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      height: 100%; gap: 6px; padding: 4px 0;
-    }
-
-    .score-anel { position: relative; width: 140px; height: 140px; margin-bottom: 10px; flex-shrink: 0; }
-    .score-anel svg { transform: rotate(-90deg); }
-
-    .score-anel .track { fill: none; stroke: var(--surface2); stroke-width: 10; }
-    .score-anel .fill  {
-      fill: none; stroke-width: 10; stroke-linecap: round;
-      stroke-dasharray: 345;
-      transition: stroke-dashoffset 1.3s cubic-bezier(0.34,1.56,0.64,1), stroke 0.5s;
-    }
-
-    .score-texto {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%,-50%); text-align: center;
-    }
-
-    .score-numero {
-      font-size: 34px; font-weight: 700;
-      font-family: 'Sora', sans-serif; line-height: 1;
-    }
-
-    .score-unid { font-size: 10px; color: var(--tx3); }
-
-    /* badge textual substituindo emojis de estrela */
-    .score-badge {
-      font-family: 'Sora', sans-serif;
-      font-size: 11px; font-weight: 700;
-      padding: 5px 16px; border-radius: 99px;
-      letter-spacing: 0.6px; text-transform: uppercase;
-      margin-top: 4px; border: 1.5px solid;
-    }
-
-    .score-badge.excelente { background: rgba(5,150,105,0.08);  color: var(--verde);    border-color: rgba(5,150,105,0.25); }
-    .score-badge.muitobom  { background: rgba(16,185,129,0.08); color: var(--bom);      border-color: rgba(16,185,129,0.25); }
-    .score-badge.bom       { background: rgba(217,119,6,0.08);  color: var(--amarelo);  border-color: rgba(217,119,6,0.25); }
-    .score-badge.regular   { background: rgba(217,119,6,0.08);  color: var(--amarelo);  border-color: rgba(217,119,6,0.25); }
-    .score-badge.critico   { background: rgba(225,29,72,0.08);  color: var(--vermelho); border-color: rgba(225,29,72,0.25); }
-
-    /* ═══════════════════════════════════════════════════
-       CARDS DE PERÍODO (Café/Almoço/Jantar)
-    ═══════════════════════════════════════════════════ */
-    .periodo-cards {
-      display: grid; grid-template-columns: repeat(3,1fr); gap: 14px;
-    }
-
-    .periodo-card {
-      border-radius: 14px;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      padding: 20px 18px 18px;
-      text-align: center;
-      transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
-      cursor: default;
-      display: flex; flex-direction: column; align-items: center;
-      position: relative; overflow: hidden;
-    }
-
-    /* faixa de cor no topo — identidade sutil */
-    .periodo-card::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0;
-      height: 3px; border-radius: 14px 14px 0 0;
-    }
-
-    .periodo-card.cafe::before   { background: var(--cafe); }
-    .periodo-card.almoco::before { background: var(--almoco); }
-    .periodo-card.jantar::before { background: var(--jantar); }
-
-    .periodo-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
-    .periodo-card.cafe:hover   { border-color: var(--cafe); }
-    .periodo-card.almoco:hover { border-color: var(--almoco); }
-    .periodo-card.jantar:hover { border-color: var(--jantar); }
-
-    /* anel de score por período */
-    .p-anel { position: relative; width: 90px; height: 90px; margin-bottom: 12px; flex-shrink: 0; }
-    .p-anel svg { transform: rotate(-90deg); }
-    .p-anel .p-track { fill: none; stroke: var(--surface2); stroke-width: 8; }
-    .p-anel .p-fill  {
-      fill: none; stroke-width: 8; stroke-linecap: round;
-      stroke-dasharray: 226;
-      transition: stroke-dashoffset 1.2s cubic-bezier(0.34,1.56,0.64,1);
-    }
-
-    .periodo-card.cafe   .p-anel .p-fill { stroke: var(--cafe); }
-    .periodo-card.almoco .p-anel .p-fill { stroke: var(--almoco); }
-    .periodo-card.jantar .p-anel .p-fill { stroke: var(--jantar); }
-
-    .p-anel-texto {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%,-50%); text-align: center;
-    }
-
-    .p-anel-num {
-      font-size: 20px; font-weight: 700;
-      font-family: 'DM Mono', monospace; line-height: 1;
-    }
-
-    .periodo-card.cafe   .p-anel-num { color: var(--cafe); }
-    .periodo-card.almoco .p-anel-num { color: var(--almoco); }
-    .periodo-card.jantar .p-anel-num { color: var(--jantar); }
-
-    .p-anel-unid { font-size: 9px; color: var(--tx3); }
-
-    .periodo-card .p-icone {
-      font-size: 14px; margin-bottom: 2px;
-      position: absolute; bottom: 4px; right: 4px;
-      opacity: 0.3;
-    }
-
-    .periodo-card .p-nome {
-      font-size: 12px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.5px;
-      margin-bottom: 14px;
-    }
-
-    .periodo-card.cafe   .p-nome { color: var(--cafe); }
-    .periodo-card.almoco .p-nome { color: var(--almoco); }
-    .periodo-card.jantar .p-nome { color: var(--jantar); }
-
-    .p-stats-row {
-      display: flex; gap: 6px; width: 100%; margin-top: 2px;
-    }
-
-    .p-stat-mini {
-      flex: 1;
-      border-radius: 8px; padding: 7px 6px; text-align: center;
-      border: 1.5px solid;
-      transition: opacity 0.15s, transform 0.15s;
-    }
-
-    .p-stat-mini:hover { opacity: 0.85; transform: translateY(-1px); }
-
-    /* total — neutro */
-    .p-stat-mini.tot {
-      background: var(--surface2);
-      border-color: var(--border);
-    }
-
-    /* satisfeitas — verde */
-    .p-stat-mini.pos {
-      background: rgba(5,150,105,0.08);
-      border-color: rgba(5,150,105,0.25);
-    }
-
-    /* negativas — rosa */
-    .p-stat-mini.neg {
-      background: rgba(251,113,133,0.10);
-      border-color: rgba(251,113,133,0.28);
-    }
-
-    .p-stat-mini .p-stat-val {
-      font-size: 14px; font-weight: 700;
-      font-family: 'DM Mono', monospace; display: block; line-height: 1;
-    }
-
-    .p-stat-mini .p-stat-lbl {
-      font-size: 9px; margin-top: 2px;
-      font-weight: 600; letter-spacing: 0.3px;
-    }
-
-    /* cores com contraste sólido */
-    .p-stat-mini.tot .p-stat-val { color: var(--tx1); }
-    .p-stat-mini.tot .p-stat-lbl { color: var(--tx3); }
-
-    .p-stat-mini.pos .p-stat-val { color: #065f46; }
-    .p-stat-mini.pos .p-stat-lbl { color: #065f46; }
-
-    .p-stat-mini.neg .p-stat-val { color: #9f1239; }
-    .p-stat-mini.neg .p-stat-lbl { color: #9f1239; }
-
-    .p-sem-dados {
-      font-size: 11px; color: var(--tx3); margin-top: 4px;
-      font-style: italic;
-    }
-
-    /* ═══════════════════════════════════════════════════
-       STATS BREAKDOWN DAS BARRAS
-    ═══════════════════════════════════════════════════ */
-    .barra-stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      margin-top: 10px;
-    }
-
-    .stat-item {
-      border-radius: 8px;
-      padding: 8px 6px;
-      text-align: center;
-      border: 1.5px solid;
-      transition: opacity 0.15s, transform 0.15s;
-    }
-
-    .stat-item:hover { opacity: 0.85; transform: translateY(-1px); }
-
-    /* cada nota tem fundo próprio — alto contraste garantido */
-    .stat-item.otimo   { background: rgba(5,150,105,0.10);  border-color: rgba(5,150,105,0.25); }
-    .stat-item.bom     { background: rgba(52,211,153,0.10); border-color: rgba(52,211,153,0.30); }
-    .stat-item.regular { background: rgba(251,191,36,0.12); border-color: rgba(251,191,36,0.35); }
-    .stat-item.ruim    { background: rgba(251,113,133,0.12);border-color: rgba(251,113,133,0.30); }
-
-    .stat-item-topo {
-      display: flex; align-items: center; justify-content: center;
-      gap: 4px; margin-bottom: 4px;
-    }
-
-    .stat-dot-sm {
-      width: 6px; height: 6px; border-radius: 2px; flex-shrink: 0;
-    }
-
-    .stat-nota {
-      font-size: 9px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.4px;
-    }
-
-    /* texto com cor sólida mais escura para contraste */
-    .stat-item.otimo   .stat-nota { color: #065f46; }
-    .stat-item.bom     .stat-nota { color: #047857; }
-    .stat-item.regular .stat-nota { color: #92400e; }
-    .stat-item.ruim    .stat-nota { color: #9f1239; }
-
-    .stat-pct {
-      font-size: 17px; font-weight: 700;
-      font-family: 'DM Mono', monospace;
-      line-height: 1; display: block;
-    }
-
-    .stat-item.otimo   .stat-pct { color: #065f46; }
-    .stat-item.bom     .stat-pct { color: #047857; }
-    .stat-item.regular .stat-pct { color: #92400e; }
-    .stat-item.ruim    .stat-pct { color: #9f1239; }
-
-    .stat-qtd {
-      font-size: 10px; color: var(--tx2);
-      font-family: 'DM Mono', monospace;
-      margin-top: 1px;
-    }
-
-    /* ═══════════════════════════════════════════════════
-       TENDÊNCIA SEMANAL
-    ═══════════════════════════════════════════════════ */
-    .tendencia-grid {
-      display: grid; grid-template-columns: repeat(7,1fr);
-      gap: 6px; align-items: end; height: 100px; margin-bottom: 8px;
-    }
-
-    .dia-col {
-      display: flex; flex-direction: column;
-      align-items: center; gap: 4px; height: 100%; justify-content: flex-end;
-    }
-
-    .dia-barra-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; }
-
-    .dia-barra {
-      width: 100%; border-radius: 5px 5px 0 0; min-height: 4px;
-      transition: height 0.6s ease;
-    }
-
-    .dia-label { font-size: 9px; font-weight: 600; color: var(--tx3); text-transform: uppercase; letter-spacing: 0.5px; }
-    .dia-total { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--tx2); font-weight: 500; }
-
-    /* ═══════════════════════════════════════════════════
-       ALERTAS NEGATIVOS
-    ═══════════════════════════════════════════════════ */
-    .alertas-lista {
-      display: flex; flex-direction: column; gap: 8px;
-      max-height: 300px; overflow-y: auto;
-    }
-
-    .alertas-lista::-webkit-scrollbar { width: 4px; }
-    .alertas-lista::-webkit-scrollbar-track { background: transparent; }
-    .alertas-lista::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
-
-    .alerta-item {
-      border-radius: 10px; padding: 11px 13px;
-      border-left: 3px solid; flex-shrink: 0;
-      transition: box-shadow 0.15s;
-    }
-
-    .alerta-item:hover { box-shadow: var(--shadow-sm); }
-
-    .alerta-item.ruim    { border-color: var(--vermelho); background: rgba(153,27,27,0.05); }
-    .alerta-item.regular { border-color: var(--amarelo);  background: rgba(146,64,14,0.05); }
-
-    .alerta-header {
-      display: flex; align-items: center; gap: 5px;
-      margin-bottom: 4px; flex-wrap: wrap;
-    }
-
-    .alerta-nota {
-      font-size: 9px; font-weight: 700;
-      padding: 2px 7px; border-radius: 99px;
-      letter-spacing: 0.4px;
-    }
-
-    .alerta-nota.ruim    { background: var(--vermelho); color: #fff; }
-    .alerta-nota.regular { background: var(--amarelo);  color: #fff; }
-
-    .alerta-periodo {
-      font-size: 9px; font-weight: 600;
-      padding: 2px 7px; border-radius: 99px;
-      background: var(--surface2); color: var(--tx2);
-    }
-
-    .alerta-data { font-size: 10px; color: var(--tx3); font-family: 'DM Mono', monospace; margin-left: auto; }
-
-    .alerta-categorias { font-size: 11px; font-weight: 600; color: var(--tx2); margin-bottom: 2px; }
-    .alerta-obs { font-size: 11px; color: var(--tx2); line-height: 1.5; font-style: italic; }
-
-    /* ═══════════════════════════════════════════════════
-       DESTAQUES CRÍTICO / MELHOR
-    ═══════════════════════════════════════════════════ */
-    .destaque-critico, .destaque-ok {
-      border-radius: 12px; padding: 14px 15px;
-      display: flex; align-items: flex-start; gap: 12px;
-    }
-
-    .destaque-critico {
-      background: rgba(225,29,72,0.06);
-      border: 1px solid rgba(225,29,72,0.18);
-    }
-
-    .destaque-ok {
-      background: rgba(5,150,105,0.06);
-      border: 1px solid rgba(5,150,105,0.18);
-    }
-
-    .destaque-critico .dc-icone,
-    .destaque-ok .dc-icone { font-size: 24px; flex-shrink: 0; margin-top: 1px; }
-
-    .destaque-critico .dc-texto strong { font-size: 13px; color: var(--vermelho); display: block; margin-bottom: 3px; }
-    .destaque-ok      .dc-texto strong { font-size: 13px; color: var(--verde);    display: block; margin-bottom: 3px; }
-
-    .destaque-critico .dc-texto span,
-    .destaque-ok      .dc-texto span   { font-size: 12px; color: var(--tx2); line-height: 1.45; }
-
-    /* ═══════════════════════════════════════════════════
-       TABELA
-    ═══════════════════════════════════════════════════ */
-    .tabela-wrap { overflow-x: auto; }
-
-    .tabela-wrap::-webkit-scrollbar { height: 4px; }
-    .tabela-wrap::-webkit-scrollbar-track { background: transparent; }
-    .tabela-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
-
-    table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-
-    thead th {
-      padding: 10px 14px; text-align: left;
-      font-size: 10px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.5px; color: var(--tx3);
-      background: var(--surface2);
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }
-
-    thead th:first-child { border-radius: 8px 0 0 0; }
-    thead th:last-child  { border-radius: 0 8px 0 0; }
-
-    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
-    tbody tr:hover { background: var(--surface2); }
-    tbody tr:last-child { border-bottom: none; }
-    tbody td { padding: 10px 14px; vertical-align: middle; }
-
-    .nota-badge {
-      display: inline-flex; align-items: center;
-      font-size: 10px; font-weight: 700;
-      padding: 3px 9px; border-radius: 99px; white-space: nowrap;
-    }
-
-    .nota-badge.otimo   { background: rgba(5,150,105,0.10);  color: var(--verde); }
-    .nota-badge.bom     { background: rgba(16,185,129,0.10); color: var(--bom); }
-    .nota-badge.regular { background: rgba(217,119,6,0.10);  color: var(--amarelo); }
-    .nota-badge.ruim    { background: rgba(225,29,72,0.10);  color: var(--vermelho); }
-
-    .periodo-badge {
-      display: inline-flex; font-size: 10px; font-weight: 700;
-      padding: 2px 8px; border-radius: 99px; white-space: nowrap;
-    }
-
-    .periodo-badge.cafe   { background: var(--cafe-ring);   color: var(--cafe); }
-    .periodo-badge.almoco { background: var(--almoco-ring); color: var(--almoco); }
-    .periodo-badge.jantar { background: var(--jantar-ring); color: var(--jantar); }
-
-    .obs-cell {
-      color: var(--tx2); font-style: italic;
-      line-height: 1.5;
-      word-break: break-word;
-      white-space: normal;
-      min-width: 180px;
-    }
-
-    .data-cell { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--tx3); white-space: nowrap; }
-
-    /* ═══════════════════════════════════════════════════
-       RODAPÉ
-    ═══════════════════════════════════════════════════ */
-    .rodape {
-      text-align: center; font-size: 11px; color: var(--tx3);
-      padding: 12px 0 4px; margin-top: 8px;
-    }
-
-    /* ═══════════════════════════════════════════════════
-       ANIMAÇÕES
-    ═══════════════════════════════════════════════════ */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-
-    /* ═══════════════════════════════════════════════════
-       RESPONSIVO
-    ═══════════════════════════════════════════════════ */
-    @media (max-width: 900px) {
-      .grid-kpis    { grid-template-columns: repeat(2,1fr); }
-      .grid-barras  { grid-template-columns: 1fr; }
-      .grid-atencao { grid-template-columns: 1fr; }
-      .grid-2       { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 600px) {
-      .main         { padding: 16px 12px; }
-      .header       { padding: 0 14px; }
-      .grid-kpis    { grid-template-columns: 1fr 1fr; }
-      .periodo-cards{ grid-template-columns: 1fr; }
-      /* ── BARRA DE ATUALIZAÇÃO ── */
-    .atualizacao-bar {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .atualizacao-texto {
-      font-size: 11.5px;
-      color: var(--tx3);
-      font-family: 'DM Mono', monospace;
-    }
-
-    .btn-atualizar {
-      display: flex; align-items: center; gap: 5px;
-      padding: 5px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      font-size: 12px; font-family: inherit; font-weight: 600;
-      color: var(--tx2); cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .btn-atualizar:hover { border-color: var(--azul); color: var(--azul); }
-    .btn-atualizar.girando .icone-refresh {
-      animation: spin 0.75s linear infinite;
-      display: inline-block;
-    }
-
-    .filtros-container { gap: 6px; }
-    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'DM Sans',system-ui,sans-serif;background:var(--page);color:var(--tx1);min-height:100vh;}
+
+    /* ── MAIN ── */
+    .main{max-width:1440px;margin:0 auto;padding:20px 20px 40px;}
+
+    /* ── PAGE HEADER ── */
+    .ph{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+    .ph-left h1{font-family:'Sora',sans-serif;font-size:24px;font-weight:800;color:var(--tx1);letter-spacing:-.4px;}
+    .ph-left p{font-size:13px;color:var(--tx2);margin-top:2px;}
+    .ph-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .btn-periodo{
+      display:flex;align-items:center;gap:6px;
+      padding:7px 13px;border-radius:8px;
+      border:1.5px solid var(--border);background:var(--surface);
+      font-size:12.5px;font-weight:600;color:var(--tx2);
+      cursor:pointer;font-family:inherit;transition:all .15s;
+    }
+    .btn-periodo.ativo,.btn-periodo:hover{border-color:var(--navy);color:var(--navy);background:rgba(26,58,110,.05);}
+    .btn-export{
+      display:flex;align-items:center;gap:5px;
+      padding:7px 13px;border-radius:8px;
+      border:1.5px solid var(--border);background:var(--surface);
+      font-size:12.5px;font-weight:600;color:var(--tx2);
+      cursor:pointer;font-family:inherit;transition:all .15s;
+    }
+    .btn-export:hover{border-color:var(--navy);color:var(--navy);}
+    .ph-divider{width:1px;height:24px;background:var(--border);}
+    .tag-data{font-size:12px;color:var(--tx3);padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;}
+
+    /* ── GRID HELPERS ── */
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+    .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+    .grid-524{display:grid;grid-template-columns:5fr 2fr 4fr;gap:14px;}
+    .grid-222-4{display:grid;grid-template-columns:2fr 2fr 2fr 4fr;gap:14px;}
+
+    /* ── CARD BASE ── */
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);}
+    .card-p{padding:16px 18px;}
+    .card-label{font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+    .card-label-gold::before{content:'';display:inline-block;width:3px;height:12px;background:var(--gold);border-radius:99px;margin-right:6px;vertical-align:middle;}
+
+    /* ── KPIs ── */
+    .kpi{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;}
+    .kpi-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+    .kpi-icon.verde{background:rgba(5,150,105,.10);}
+    .kpi-icon.roxo{background:rgba(124,58,237,.10);}
+    .kpi-icon.azul{background:rgba(26,58,110,.08);}
+    .kpi-icon.vermelho{background:rgba(225,29,72,.10);}
+    .kpi-body{flex:1;min-width:0;}
+    .kpi-label{font-size:12px;color:var(--tx2);margin-bottom:2px;}
+    .kpi-val{font-family:'Sora',sans-serif;font-size:28px;font-weight:800;color:var(--tx1);line-height:1;margin-bottom:4px;}
+    .kpi-sub{font-size:11px;color:var(--tx3);}
+    .kpi-var{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:700;margin-top:4px;}
+    .kpi-var.up{color:var(--verde);}
+    .kpi-var.down{color:var(--vermelho);}
+    .kpi-var.neu{color:var(--tx3);}
+    .kpi-spark{width:100%;height:36px;margin-top:6px;}
+
+    /* ── SECTION TITLE ── */
+    .sec-title{font-size:13px;font-weight:700;color:var(--tx1);display:flex;align-items:center;gap:6px;margin-bottom:14px;}
+    .sec-title::before{content:'';display:block;width:3px;height:15px;background:var(--gold);border-radius:99px;flex-shrink:0;}
+    .sec-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:rgba(26,58,110,.08);color:var(--navy);}
+
+    /* ── CHARTS ── */
+    .chart-wrap{position:relative;width:100%;}
+
+    /* ── MÉDIA POR CATEGORIA ── */
+    .cat-lista{display:flex;flex-direction:column;gap:10px;}
+    .cat-item{display:flex;align-items:center;gap:10px;}
+    .cat-nome{font-size:12.5px;color:var(--tx2);width:80px;flex-shrink:0;}
+    .cat-barra-wrap{flex:1;height:10px;background:var(--border);border-radius:99px;overflow:hidden;}
+    .cat-barra{height:100%;border-radius:99px;transition:width .6s ease;}
+    .cat-val{font-size:13px;font-weight:700;color:var(--tx1);width:30px;text-align:right;flex-shrink:0;}
+    .cat-star{color:var(--gold);font-size:11px;}
+    .cat-escala{font-size:10px;color:var(--tx3);margin-top:10px;text-align:right;}
+
+    /* ── TOP OBSERVAÇÕES ── */
+    .obs-lista{display:flex;flex-direction:column;gap:6px;}
+    .obs-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);}
+    .obs-item:last-child{border:none;}
+    .obs-palavra{font-size:12.5px;color:var(--tx2);flex:1;}
+    .obs-barra-wrap{width:80px;height:6px;background:var(--border);border-radius:99px;overflow:hidden;}
+    .obs-barra{height:100%;background:var(--navy);border-radius:99px;}
+    .obs-cnt{font-size:12px;font-weight:700;color:var(--tx1);width:24px;text-align:right;}
+
+    /* ── PERÍODO ── */
+    .per-lista{display:flex;flex-direction:column;gap:10px;}
+    .per-item{display:flex;align-items:center;gap:10px;}
+    .per-nome{font-size:11.5px;color:var(--tx2);width:120px;flex-shrink:0;line-height:1.3;}
+    .per-barra-wrap{flex:1;height:16px;background:var(--border);border-radius:6px;overflow:hidden;}
+    .per-barra{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:6px;font-size:9px;font-weight:700;color:#fff;transition:width .6s ease;}
+    .per-val{font-size:12px;font-weight:700;color:var(--tx1);width:56px;text-align:right;flex-shrink:0;}
+
+    /* ── DONUT LEGENDA ── */
+    .leg-wrap{display:flex;flex-direction:column;gap:7px;}
+    .leg-item{display:flex;align-items:center;gap:7px;}
+    .leg-cor{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .leg-txt{font-size:12px;color:var(--tx2);flex:1;}
+    .leg-val{font-size:12px;font-weight:700;color:var(--tx1);}
+    .leg-pct{font-size:11px;color:var(--tx3);}
+    .donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
+    .donut-num{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:var(--tx1);line-height:1;}
+    .donut-sub{font-size:10px;color:var(--tx3);}
+
+    /* ── INSIGHTS ── */
+    .insight-lista{display:flex;flex-direction:column;gap:10px;}
+    .insight-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--page);border-radius:8px;}
+    .insight-icone{font-size:16px;flex-shrink:0;margin-top:1px;}
+    .insight-txt{font-size:13px;color:var(--tx2);line-height:1.5;}
+
+    /* ── ALERTAS ── */
+    .alerta-lista{display:flex;flex-direction:column;gap:10px;}
+    .alerta-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;border:1px solid;}
+    .alerta-item.critico{background:rgba(225,29,72,.05);border-color:rgba(225,29,72,.20);}
+    .alerta-item.atencao{background:rgba(217,119,6,.05);border-color:rgba(217,119,6,.20);}
+    .alerta-item.info{background:rgba(26,58,110,.05);border-color:rgba(26,58,110,.15);}
+    .alerta-icone{font-size:18px;flex-shrink:0;}
+    .alerta-corpo{flex:1;}
+    .alerta-titulo{font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:2px;}
+    .alerta-desc{font-size:12px;color:var(--tx2);line-height:1.4;}
+    .btn-det{padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:var(--surface);font-size:11.5px;font-weight:600;color:var(--tx2);cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+    .btn-det:hover{border-color:var(--navy);color:var(--navy);}
+
+    /* ── TABELA ATENÇÃO ── */
+    .tab-aten{width:100%;border-collapse:collapse;}
+    .tab-aten thead th{padding:9px 12px;font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.6px;background:var(--page);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;}
+    .tab-aten tbody td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;}
+    .tab-aten tbody tr:last-child td{border:none;}
+    .tab-aten tbody tr:hover{background:rgba(26,58,110,.02);}
+    .td-data{color:var(--tx2);font-size:12px;white-space:nowrap;}
+    .td-obs-txt{font-size:12px;color:var(--tx2);max-width:220px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+
+    /* ── BADGES ── */
+    .nota-badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap;}
+    .nota-badge.otimo{background:rgba(5,150,105,.10);color:var(--verde);}
+    .nota-badge.bom{background:rgba(16,185,129,.10);color:var(--verde2);}
+    .nota-badge.regular{background:rgba(217,119,6,.10);color:var(--amarelo);}
+    .nota-badge.ruim{background:rgba(225,29,72,.10);color:var(--vermelho);}
+    .ref-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap;}
+    .ref-badge.cafe{background:rgba(234,88,12,.10);color:#ea580c;}
+    .ref-badge.almoco{background:rgba(37,99,235,.10);color:#2563eb;}
+    .ref-badge.jantar{background:rgba(124,58,237,.10);color:var(--roxo);}
+
+    /* ── EMPTY ── */
+    .empty{text-align:center;padding:32px;color:var(--tx3);font-size:13px;}
+
+    /* ── OVERLAY ── */
+    .overlay{position:fixed;inset:0;background:var(--page);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:opacity .4s;}
+    .overlay.oculto{opacity:0;pointer-events:none;}
+    .overlay.erro .spinner{display:none;}
+    .spinner{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .overlay-msg{font-size:14px;color:var(--tx2);text-align:center;max-width:400px;line-height:1.6;}
+    .btn-recarregar{margin-top:8px;padding:8px 20px;border-radius:8px;background:var(--navy);color:#fff;border:none;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;}
+
+    /* ── RESPONSIVO ── */
+    @media(max-width:1200px){
+      .grid-524{grid-template-columns:1fr 1fr;}.grid-222-4{grid-template-columns:1fr 1fr;}
+    }
+    @media(max-width:900px){
+      .grid4,.grid3,.grid2{grid-template-columns:1fr 1fr;}
+      .grid-524,.grid-222-4{grid-template-columns:1fr;}
+    }
+    @media(max-width:580px){
+      .grid4,.grid3,.grid2{grid-template-columns:1fr;}
+      .main{padding:14px 12px 32px;}
+      .ph{flex-direction:column;align-items:flex-start;}
+    }
+
+    /* ── GAP ROWS ── */
+    .mb14{margin-bottom:14px;}
+    .mb20{margin-bottom:20px;}
   </style>
 </head>
 <body>
 
-<!-- NAV DE NAVEGAÇÃO -->
-
-
-<!-- OVERLAY -->
+<!-- OVERLAY LOADING -->
 <div class="overlay" id="overlay">
   <div class="spinner"></div>
-  <p id="overlay-msg">Conectando ao banco de dados…</p>
+  <p class="overlay-msg" id="overlay-msg">Conectando ao banco de dados…</p>
   <button class="btn-recarregar" id="btn-recarregar" style="display:none" onclick="carregarDados()">🔄 Tentar novamente</button>
 </div>
 
+<!-- MAIN -->
+<div class="main" id="main">
 
-
-<!-- CONTEÚDO -->
-<div class="main">
-
-  <!-- BARRA DE ATUALIZAÇÃO -->
-  <div class="atualizacao-bar">
-    <span class="atualizacao-texto" id="ultima-atualizacao"></span>
-    <button class="btn-atualizar" id="btn-atualizar" onclick="carregarDados()">
-      <span class="icone-refresh">🔄</span> Atualizar
-    </button>
-  </div>
-
-  <!-- FILTROS -->
-  <div class="filtros-container">
-    <div class="filtros-grupo">
-      <span class="filtros-label">Período</span>
-      <button class="filtro-btn ativo" onclick="filtrarDias(7,this)">7 dias</button>
-      <button class="filtro-btn"       onclick="filtrarDias(30,this)">30 dias</button>
-      <button class="filtro-btn"       onclick="filtrarDias(90,this)">90 dias</button>
-      <button class="filtro-btn"       onclick="filtrarDias(0,this)">Tudo</button>
+  <!-- PAGE HEADER -->
+  <div class="ph mb20">
+    <div class="ph-left">
+      <h1>Dashboard</h1>
+      <p>Visão geral da satisfação e desempenho — <span id="data-atual"></span></p>
     </div>
-    <div class="filtro-sep"></div>
-    <div class="filtros-grupo">
-      <span class="filtros-label">Refeição</span>
-      <button class="filtro-btn ativo"  id="btn-todos-periodo" onclick="filtrarPeriodo('',this)">Todas</button>
-      <button class="filtro-btn cafe"   onclick="filtrarPeriodo('Café da Manhã',this)">☕ Café da Manhã</button>
-      <button class="filtro-btn almoco" onclick="filtrarPeriodo('Almoço',this)">🍛 Almoço</button>
-      <button class="filtro-btn jantar" onclick="filtrarPeriodo('Jantar',this)">🍲 Jantar</button>
+    <div class="ph-right">
+      <button class="btn-periodo ativo" onclick="setDias(7)"  id="btn7">7 dias</button>
+      <button class="btn-periodo"       onclick="setDias(30)" id="btn30">30 dias</button>
+      <button class="btn-periodo"       onclick="setDias(90)" id="btn90">90 dias</button>
+      <div class="ph-divider"></div>
+      <button class="btn-export" onclick="exportarCSV()">⬇️ CSV</button>
+      <button class="btn-export" onclick="window.print()">🖨️ PDF</button>
+      <span class="tag-data" id="tag-periodo">—</span>
     </div>
   </div>
 
   <!-- KPIs -->
-  <div class="grid-kpis">
-
-    <div class="kpi azul">
-      <div class="kpi-topo">
-        <div>
-          <div class="kpi-valor" id="kpi-total">—</div>
-          <div class="kpi-label">Respostas</div>
+  <div class="grid4 mb14">
+    <div class="card">
+      <div class="kpi">
+        <div class="kpi-icon verde">😊</div>
+        <div class="kpi-body">
+          <div class="kpi-label">Satisfação geral</div>
+          <div class="kpi-val" id="kpi-sat">—</div>
+          <div class="kpi-sub">Positivas (Ótimo + Bom)</div>
+          <div class="kpi-var" id="kpi-sat-var">—</div>
         </div>
-        <div class="kpi-icone">📋</div>
       </div>
-      <div class="kpi-sub"      id="kpi-hoje">—</div>
-      <div class="kpi-variacao" id="kpi-total-var"></div>
+      <div style="padding:0 14px 12px"><canvas id="spark-sat" class="kpi-spark"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="kpi">
+        <div class="kpi-icon roxo">⭐</div>
+        <div class="kpi-body">
+          <div class="kpi-label">Média geral</div>
+          <div class="kpi-val" id="kpi-media">—</div>
+          <div class="kpi-sub">Escala de 1 (Ruim) a 4 (Ótimo)</div>
+          <div class="kpi-var" id="kpi-media-var">—</div>
+        </div>
+      </div>
+      <div style="padding:0 14px 12px"><canvas id="spark-media" class="kpi-spark"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="kpi">
+        <div class="kpi-icon azul">💬</div>
+        <div class="kpi-body">
+          <div class="kpi-label">Total de respostas</div>
+          <div class="kpi-val" id="kpi-total">—</div>
+          <div class="kpi-sub">No período</div>
+          <div class="kpi-var" id="kpi-total-var">—</div>
+        </div>
+      </div>
+      <div style="padding:0 14px 12px"><canvas id="spark-total" class="kpi-spark"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="kpi">
+        <div class="kpi-icon vermelho">😢</div>
+        <div class="kpi-body">
+          <div class="kpi-label">Avaliações negativas</div>
+          <div class="kpi-val" id="kpi-neg">—</div>
+          <div class="kpi-sub">Ruim</div>
+          <div class="kpi-var" id="kpi-neg-var">—</div>
+        </div>
+      </div>
+      <div style="padding:0 14px 12px"><canvas id="spark-neg" class="kpi-spark"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Evolução + Donut refeição + Média categorias -->
+  <div class="grid-524 mb14">
+
+    <!-- Evolução da satisfação -->
+    <div class="card card-p">
+      <div class="sec-title card-label-gold">Evolução da satisfação</div>
+      <div class="chart-wrap" style="height:180px">
+        <canvas id="chart-evolucao"></canvas>
+      </div>
     </div>
 
-    <div class="kpi verde">
-      <div class="kpi-topo">
-        <div>
-          <div class="kpi-valor" id="kpi-positivo">—</div>
-          <div class="kpi-label">Ótimo + Bom</div>
+    <!-- Donut por refeição -->
+    <div class="card card-p">
+      <div class="sec-title card-label-gold">Satisfação por refeição</div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="position:relative;width:110px;height:110px;flex-shrink:0">
+          <canvas id="chart-ref"></canvas>
+          <div class="donut-center">
+            <div class="donut-num" id="ref-total">0</div>
+            <div class="donut-sub">Total</div>
+          </div>
         </div>
-        <div class="kpi-icone">😀</div>
+        <div class="leg-wrap" id="leg-ref"></div>
       </div>
-      <div class="kpi-sub"      id="kpi-positivo-pct">—</div>
-      <div class="kpi-variacao" id="kpi-positivo-var"></div>
     </div>
 
-    <div class="kpi amarelo">
-      <div class="kpi-topo">
-        <div>
-          <div class="kpi-valor" id="kpi-regular">—</div>
-          <div class="kpi-label">Regulares</div>
-        </div>
-        <div class="kpi-icone">😐</div>
-      </div>
-      <div class="kpi-sub"      id="kpi-regular-pct">—</div>
-      <div class="kpi-variacao" id="kpi-regular-var"></div>
-    </div>
-
-    <div class="kpi vermelho">
-      <div class="kpi-topo">
-        <div>
-          <div class="kpi-valor" id="kpi-ruim">—</div>
-          <div class="kpi-label">Ruim</div>
-        </div>
-        <div class="kpi-icone">☹️</div>
-      </div>
-      <div class="kpi-sub"      id="kpi-ruim-pct">—</div>
-      <div class="kpi-variacao" id="kpi-ruim-var"></div>
+    <!-- Média por categoria -->
+    <div class="card card-p">
+      <div class="sec-title card-label-gold">Média por categoria</div>
+      <div class="cat-lista" id="cat-lista"></div>
+      <div class="cat-escala">Escala: 1 (Ruim) a 4 (Ótimo)</div>
     </div>
 
   </div>
 
-  <!-- COMPARATIVO POR REFEIÇÃO -->
-  <div class="card grid-full">
-    <div class="card-titulo">Comparativo por refeição — Score de satisfação (0–100)</div>
-    <div class="periodo-cards" id="periodo-cards"></div>
-  </div>
+  <!-- ROW 3: Distribuição + Negativas/dia + Período + Top obs -->
+  <div class="grid-222-4 mb14">
 
-  <!-- BARRAS + SCORE -->
-  <div class="grid-barras">
-
-    <div class="card">
-      <div class="card-titulo">Satisfação por categoria</div>
-
-      <div class="barra-grupo">
-        <div class="barra-header">
-          <span class="barra-nome">🍽️ Refeição</span>
-          <span class="barra-pct" id="pct-ref">—</span>
-        </div>
-        <div class="barra-track">
-          <div class="barra-seg" id="bar-ref-ot" style="background:var(--bar-otimo);width:0%"></div>
-          <div class="barra-seg" id="bar-ref-bm" style="background:var(--bar-bom);width:0%"></div>
-          <div class="barra-seg" id="bar-ref-rg" style="background:var(--bar-regular);width:0%"></div>
-          <div class="barra-seg" id="bar-ref-rm" style="background:var(--bar-ruim);width:0%"></div>
-        </div>
-        <div class="barra-stats">
-          <div class="stat-item otimo">
-            <div class="stat-item-topo"><div class="stat-dot-sm" style="background:var(--bar-otimo)"></div><span class="stat-nota">Ótima</span></div>
-            <span class="stat-pct" id="stat-ref-ot-p">—</span>
-            <div class="stat-qtd" id="stat-ref-ot-n">—</div>
-          </div>
-          <div class="stat-item bom">
-            <div class="stat-item-topo"><div class="stat-dot-sm" style="background:var(--bar-bom)"></div><span class="stat-nota">Boa</span></div>
-            <span class="stat-pct" id="stat-ref-bm-p">—</span>
-            <div class="stat-qtd" id="stat-ref-bm-n">—</div>
-          </div>
-          <div class="stat-item regular">
-            <div class="stat-item-topo"><div class="stat-dot-sm" style="background:var(--bar-regular)"></div><span class="stat-nota">Regular</span></div>
-            <span class="stat-pct" id="stat-ref-rg-p">—</span>
-            <div class="stat-qtd" id="stat-ref-rg-n">—</div>
-          </div>
-          <div class="stat-item ruim">
-            <div class="stat-item-topo"><div class="stat-dot-sm" style="background:var(--bar-ruim)"></div><span class="stat-nota">Ruim</span></div>
-            <span class="stat-pct" id="stat-ref-rm-p">—</span>
-            <div class="stat-qtd" id="stat-ref-rm-n">—</div>
+    <!-- Distribuição das avaliações -->
+    <div class="card card-p">
+      <div class="sec-title card-label-gold">Distribuição das avaliações</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="position:relative;width:100px;height:100px;flex-shrink:0">
+          <canvas id="chart-distrib"></canvas>
+          <div class="donut-center">
+            <div class="donut-num" id="distrib-total">0</div>
+            <div class="donut-sub">Total</div>
           </div>
         </div>
-      </div>
-
-      <div class="barra-grupo">
-        <div class="barra-header">
-          <span class="barra-nome">👋 Atendimento</span>
-          <span class="barra-pct" id="pct-ate">—</span>
-        </div>
-        <div class="barra-track">
-          <div class="barra-seg" id="bar-ate-ot" style="background:var(--bar-otimo);width:0%"></div>
-          <div class="barra-seg" id="bar-ate-bm" style="background:var(--bar-bom);width:0%"></div>
-          <div class="barra-seg" id="bar-ate-rg" style="background:var(--bar-regular);width:0%"></div>
-          <div class="barra-seg" id="bar-ate-rm" style="background:var(--bar-ruim);width:0%"></div>
-        </div>
-        <div class="barra-stats">
-          <div class="stat-item otimo">
-            <div class="stat-item-topo"><div class="stat-dot-sm" style="background:var(--bar-otimo)"></div><span class="stat-nota">Ótimo</span></div>
-            <span class="stat-pct" id="stat-ate-ot-p">—</span>
-            <div class="stat-qtd" id="stat-ate-ot-n">—</div>
-          </div>
-          <div class="stat-item bom">
-            <div class="stat-item-topo"><div class="stat-dot-sm" style="background:var(--bar-bom)"></div><span class="stat-nota">Bom</span></div>
-            <span class="stat-pct" id="stat-ate-bm-p">—</span>
-            <div class="stat-qtd" id="stat-ate-bm-n">—</div>
-          </div>
-          <div class="stat-item regular">
-            <div class="stat-item-topo"><div class="stat-dot-sm" style="background:var(--bar-regular)"></div><span class="stat-nota">Regular</span></div>
-            <span class="stat-pct" id="stat-ate-rg-p">—</span>
-            <div class="stat-qtd" id="stat-ate-rg-n">—</div>
-          </div>
-          <div class="stat-item ruim">
-            <div class="stat-item-topo"><div class="stat-dot-sm" style="background:var(--bar-ruim)"></div><span class="stat-nota">Ruim</span></div>
-            <span class="stat-pct" id="stat-ate-rm-p">—</span>
-            <div class="stat-qtd" id="stat-ate-rm-n">—</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="barra-grupo">
-        <div class="barra-header">
-          <span class="barra-nome">🧹 Ambiente</span>
-          <span class="barra-pct" id="pct-amb">—</span>
-        </div>
-        <div class="barra-track">
-          <div class="barra-seg" id="bar-amb-ot" style="background:var(--bar-otimo);width:0%"></div>
-          <div class="barra-seg" id="bar-amb-bm" style="background:var(--bar-bom);width:0%"></div>
-          <div class="barra-seg" id="bar-amb-rg" style="background:var(--bar-regular);width:0%"></div>
-          <div class="barra-seg" id="bar-amb-rm" style="background:var(--bar-ruim);width:0%"></div>
-        </div>
-        <div class="barra-stats">
-          <div class="stat-item otimo">
-            <div class="stat-item-topo"><div class="stat-dot-sm" style="background:var(--bar-otimo)"></div><span class="stat-nota">Ótimo</span></div>
-            <span class="stat-pct" id="stat-amb-ot-p">—</span>
-            <div class="stat-qtd" id="stat-amb-ot-n">—</div>
-          </div>
-          <div class="stat-item bom">
-            <div class="stat-item-topo"><div class="stat-dot-sm" style="background:var(--bar-bom)"></div><span class="stat-nota">Bom</span></div>
-            <span class="stat-pct" id="stat-amb-bm-p">—</span>
-            <div class="stat-qtd" id="stat-amb-bm-n">—</div>
-          </div>
-          <div class="stat-item regular">
-            <div class="stat-item-topo"><div class="stat-dot-sm" style="background:var(--bar-regular)"></div><span class="stat-nota">Regular</span></div>
-            <span class="stat-pct" id="stat-amb-rg-p">—</span>
-            <div class="stat-qtd" id="stat-amb-rg-n">—</div>
-          </div>
-          <div class="stat-item ruim">
-            <div class="stat-item-topo"><div class="stat-dot-sm" style="background:var(--bar-ruim)"></div><span class="stat-nota">Ruim</span></div>
-            <span class="stat-pct" id="stat-amb-rm-p">—</span>
-            <div class="stat-qtd" id="stat-amb-rm-n">—</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="barra-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:var(--bar-otimo)"></div>Ótimo</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--bar-bom)"></div>Bom</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--bar-regular)"></div>Regular</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--bar-ruim)"></div>Ruim</div>
+        <div class="leg-wrap" id="leg-distrib"></div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-titulo">Score geral</div>
-      <div class="score-container">
-        <div class="score-anel">
-          <svg viewBox="0 0 120 120" width="140" height="140">
-            <circle class="track" cx="60" cy="60" r="55"/>
-            <circle class="fill" id="score-fill" cx="60" cy="60" r="55"
-                    stroke="#1565c0" stroke-dashoffset="345"/>
-          </svg>
-          <div class="score-texto">
-            <div class="score-numero" id="score-num">—</div>
-            <div class="score-unid">/ 100</div>
-          </div>
-        </div>
-        <div class="score-badge" id="score-badge">—</div>
+    <!-- Avaliações negativas por dia -->
+    <div class="card card-p">
+      <div class="sec-title card-label-gold">Negativas por dia</div>
+      <div class="chart-wrap" style="height:120px">
+        <canvas id="chart-neg-dia"></canvas>
       </div>
+    </div>
+
+    <!-- Distribuição por período do dia -->
+    <div class="card card-p">
+      <div class="sec-title card-label-gold">Por período do dia</div>
+      <div class="per-lista" id="per-lista"></div>
+    </div>
+
+    <!-- Top observações -->
+    <div class="card card-p">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="sec-title" style="margin:0">Top observações</div>
+        <span style="font-size:11px;color:var(--tx3)">Frequência</span>
+      </div>
+      <div class="obs-lista" id="obs-lista"><div class="empty">Sem observações</div></div>
+      <a href="respostas.html" style="display:flex;align-items:center;gap:4px;margin-top:12px;font-size:12.5px;font-weight:600;color:var(--navy);text-decoration:none;">
+        Ver todas as observações →
+      </a>
     </div>
 
   </div>
 
-  <!-- ATENÇÃO + MELHOR -->
-  <div class="grid-atencao">
-    <div class="card">
-      <div class="card-titulo">Atenção imediata</div>
-      <div id="destaque-critico"></div>
-      <div id="destaque-melhor"></div>
+  <!-- ROW 4: Insights + Alertas -->
+  <div class="grid2 mb14">
+    <div class="card card-p">
+      <div class="sec-title card-label-gold">📈 Insights automáticos</div>
+      <div class="insight-lista" id="insight-lista"></div>
     </div>
-
-    <div class="card">
-      <div class="card-titulo">Respostas — últimos 7 dias</div>
-      <div class="tendencia-grid" id="tendencia-grid"></div>
-      <div class="barra-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#1565c0;border-radius:3px"></div>Respostas/dia</div>
-      </div>
+    <div class="card card-p">
+      <div class="sec-title card-label-gold">🚨 Alertas</div>
+      <div class="alerta-lista" id="alerta-lista"></div>
     </div>
   </div>
 
-  <!-- ALERTAS + TENDÊNCIA -->
-  <div class="grid-full">
-    <div class="card">
-      <div class="card-titulo">Últimas avaliações negativas</div>
-      <div class="alertas-lista" id="alertas-lista"></div>
+  <!-- ROW 5: Atenção imediata -->
+  <div class="card card-p mb14">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div class="sec-title" style="margin:0">⚠️ Atenção imediata</div>
+      <span class="sec-badge" id="badge-aten">0</span>
+      <span style="font-size:12px;color:var(--tx3)">Avaliações negativas com observação</span>
     </div>
-  </div>
-
-  <!-- TABELA -->
-  <div class="card grid-full">
-    <div class="card-titulo">Últimas respostas</div>
-    <div class="tabela-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Data/Hora</th>
-            <th>Refeição</th>
-            <th>🍽️ Qualidade</th>
-            <th>👋 Atendimento</th>
-            <th>🧹 Ambiente</th>
-            <th>Observação</th>
-          </tr>
-        </thead>
-        <tbody id="tabela-corpo"></tbody>
+    <div style="overflow-x:auto">
+      <table class="tab-aten">
+        <thead><tr>
+          <th>Data/Hora</th><th>Refeição</th><th>Avaliação</th>
+          <th>Atendimento</th><th>Ambiente</th><th>Observação</th>
+        </tr></thead>
+        <tbody id="tab-aten-body"><tr><td colspan="6" class="empty">Nenhuma ocorrência</td></tr></tbody>
       </table>
     </div>
   </div>
 
-  <div class="rodape">Restaurante Comunitário de Sobradinho - <span id="data-atual"></span></div>
+  <!-- ROW 6: Últimas avaliações negativas -->
+  <div class="card card-p">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div class="sec-title" style="margin:0">📋 Últimas avaliações negativas</div>
+      <span class="sec-badge" id="badge-neg">0</span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tab-aten">
+        <thead><tr>
+          <th>Data/Hora</th><th>Refeição</th><th>Avaliação</th>
+          <th>Atendimento</th><th>Ambiente</th><th>Nome</th><th>Observação</th>
+        </tr></thead>
+        <tbody id="tab-neg-body"><tr><td colspan="7" class="empty">Nenhuma avaliação negativa</td></tr></tbody>
+      </table>
+    </div>
+  </div>
 
 </div><!-- /main -->
 
-
   <script>window.NAV_ATIVO = "dashboard";</script>
   <script src="js/nav.js"></script>
-  <script>
-  // ══════════════════════════════════════════════════
-  //  ⚠️  COLE AQUI AS SUAS CREDENCIAIS DO SUPABASE
-  // ══════════════════════════════════════════════════
-  const SUPABASE_URL = 'https://kosiqdzgyutdsexclzvk.supabase.co'; // ← substitua pela sua URL
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2lxZHpneXV0ZHNleGNsenZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjQyMTIsImV4cCI6MjA5MzAwMDIxMn0.Aq4ZExIo8O82eB0B2-t8Nh-NyBfCm3sb1vRhutlLOFo'; // ← substitua pela sua anon key
-  // ══════════════════════════════════════════════════
+
+<script>
+  const SUPABASE_URL = 'https://kosiqdzgyutdsexclzvk.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2lxZHpneXV0ZHNleGNsenZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjQyMTIsImV4cCI6MjA5MzAwMDIxMn0.Aq4ZExIo8O82eB0B2-t8Nh-NyBfCm3sb1vRhutlLOFo';
 
   const { createClient } = supabase;
   const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-  const TABELA = 'respostas';
-  let _perfil = null;
 
-  // ── Auth: verifica sessão antes de carregar ────────
-  async function initAuth() {
-    // Verifica se há sessão ativa
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session) {
-      window.location.href = 'login.html';
-      return false;
+  let todosOsDados = [];
+  let dadosAtual   = [];
+  let dadosAnt     = [];
+  let diasFiltro   = 7;
+  let _token       = '';
+
+  // Charts
+  let cEvolucao, cRef, cDistrib, cNegDia;
+  let cSparkSat, cSparkMedia, cSparkTotal, cSparkNeg;
+
+  // ── UTILS ────────────────────────────────────────────────────
+  function notaValida(n) {
+    return n && n !== 'null' && n !== 'EMPTY' && n !== '' &&
+      ['Ótima','Ótimo','Boa','Bom','Regular','Ruim'].includes(n);
+  }
+
+  function scoreNota(n) {
+    if (!notaValida(n)) return null;
+    return {'Ótima':4,'Ótimo':4,'Boa':3,'Bom':3,'Regular':2,'Ruim':1}[n] ?? null;
+  }
+
+  function classeNota(n) {
+    if (!notaValida(n)) return '';
+    if (['Ótima','Ótimo'].includes(n)) return 'otimo';
+    if (['Boa','Bom'].includes(n))     return 'bom';
+    if (n === 'Regular')               return 'regular';
+    return 'ruim';
+  }
+
+  function nomePeriodo(p) {
+    return {cafe:'Café da Manhã',almoco:'Almoço',jantar:'Jantar'}[p] || p || '—';
+  }
+
+  function classeRef(p) {
+    return {cafe:'cafe',almoco:'almoco',jantar:'jantar'}[p] || '';
+  }
+
+  function celulaNota(v) {
+    if (!notaValida(v)) return '<em style="color:var(--tx3)">—</em>';
+    return `<span class="nota-badge ${classeNota(v)}">${v}</span>`;
+  }
+
+  function fmt(ts) {
+    if (!ts) return '—';
+    const d = new Date(ts);
+    return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})
+      + ', ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  }
+
+  function pct(a, b) { return b > 0 ? Math.round(a/b*100) : 0; }
+  function pctStr(a, b) { return b > 0 ? Math.round(a/b*100)+'%' : '—'; }
+
+  function calcMedia(dados) {
+    const vals = dados
+      .flatMap(r => [r.refeicao, r.atendimento, r.ambiente])
+      .filter(notaValida).map(scoreNota).filter(v => v !== null);
+    return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+  }
+
+  function calcMediaCat(dados, campo) {
+    const vals = dados.map(r => r[campo]).filter(notaValida).map(scoreNota).filter(v=>v!==null);
+    return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+  }
+
+  function calcPctPos(dados) {
+    const totalAv = dados.reduce((a,r)=>
+      a+[r.refeicao,r.atendimento,r.ambiente].filter(notaValida).length,0);
+    const pos = dados.reduce((a,r)=>
+      a+[r.refeicao,r.atendimento,r.ambiente].filter(n=>['Ótima','Ótimo','Boa','Bom'].includes(n)).length,0);
+    return totalAv > 0 ? pct(pos, totalAv) : null;
+  }
+
+  function calcPctNeg(dados) {
+    const totalAv = dados.reduce((a,r)=>
+      a+[r.refeicao,r.atendimento,r.ambiente].filter(notaValida).length,0);
+    const neg = dados.reduce((a,r)=>
+      a+[r.refeicao,r.atendimento,r.ambiente].filter(n=>n==='Ruim').length,0);
+    return totalAv > 0 ? pct(neg, totalAv) : null;
+  }
+
+  function varTag(atual, ant, menor=false) {
+    if (atual===null || ant===null) return '<span class="kpi-var neu">— sem dados anteriores</span>';
+    const diff = typeof atual==='number' ? atual-ant : null;
+    if (diff===null) return '';
+    const sinal = diff >= 0 ? '↑' : '↓';
+    const cls   = (diff >= 0) === !menor ? 'up' : 'down';
+    const abs   = Math.abs(diff);
+    const fmt   = Number.isInteger(abs) ? abs : abs.toFixed(2);
+    return `<span class="kpi-var ${cls}">${sinal} ${fmt} vs período anterior</span>`;
+  }
+
+  // ── AGRUPAR POR DIA ──────────────────────────────────────────
+  function agruparPorDia(dados) {
+    const g = {};
+    dados.forEach(r => {
+      const d = r.created_at?.substring(0,10);
+      if (!d) return;
+      if (!g[d]) g[d] = [];
+      g[d].push(r);
+    });
+    return g;
+  }
+
+  function diasRange(n) {
+    const dias = [];
+    for (let i=n-1; i>=0; i--) {
+      const d = new Date(); d.setDate(d.getDate()-i);
+      dias.push(d.toISOString().split('T')[0]);
     }
+    return dias;
+  }
 
-    const token = session.access_token;
+  // ── AUTH ─────────────────────────────────────────────────────
+  async function initAuth() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return false; }
+    _token = session.access_token;
 
-    // Busca o perfil com até 3 tentativas para evitar falha por latência
     let perfil = null;
-    for (let tentativa = 1; tentativa <= 3; tentativa++) {
+    for (let t=1; t<=3; t++) {
       try {
         const rows = await fetch(
           `${SUPABASE_URL}/rest/v1/perfis?id=eq.${session.user.id}&select=*`,
-          {
-            headers: {
-              'apikey':        SUPABASE_KEY,
-              'Authorization': `Bearer ${token}`,
-              'Accept':        'application/json'
-            }
-          }
-        ).then(r => r.ok ? r.json() : []);
-
-        if (rows && rows.length > 0) {
-          perfil = rows[0];
-          break;
-        }
-      } catch (e) {
-        // aguarda 500ms antes da próxima tentativa
-        await new Promise(r => setTimeout(r, 500));
-      }
+          { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${_token}`, 'Accept': 'application/json' } }
+        ).then(r => r.json());
+        if (rows?.length) { perfil = rows[0]; break; }
+      } catch(e) { await new Promise(r=>setTimeout(r,500)); }
     }
 
-    // Perfil não encontrado após 3 tentativas
     if (!perfil) {
-      // Mostra overlay com erro em vez de fazer loop
-      const overlay = document.getElementById('overlay');
-      const msgEl   = document.getElementById('overlay-msg');
-      const btnRec  = document.getElementById('btn-recarregar');
-      overlay.classList.remove('oculto', 'erro');
-      overlay.classList.add('erro');
-      msgEl.innerHTML = `⚠️ Perfil de acesso não encontrado.<br><br>
-        Verifique se seu usuário foi registrado corretamente<br>
-        na tabela <strong>perfis</strong> do Supabase.<br><br>
-        <small style="color:#999">ID: ${session.user.id}</small>`;
-      btnRec.style.display   = 'inline-block';
-      btnRec.textContent     = '🔐 Voltar ao login';
-      btnRec.onclick         = async () => {
-        await sb.auth.signOut();
-        window.location.href = 'login.html';
-      };
+      document.getElementById('overlay-msg').innerHTML =
+        '⚠️ Perfil não encontrado.<br><small style="color:#999">ID: '+session.user.id+'</small>';
+      document.getElementById('btn-recarregar').textContent = '🔐 Voltar ao login';
+      document.getElementById('btn-recarregar').style.display = 'block';
+      document.getElementById('btn-recarregar').onclick = async ()=>{await sb.auth.signOut();location.href='login.html';};
       return false;
     }
+    if (!perfil.ativo) { await sb.auth.signOut(); location.href='login.html?erro=inativo'; return false; }
 
-    // Perfil inativo
-    if (!perfil.ativo) {
-      await sb.auth.signOut();
-      window.location.href = 'login.html?erro=inativo';
-      return false;
-    }
-
-    _perfil = perfil;
-    const nav = document.getElementById('navTop');
-    nav.style.display = 'flex';
-    document.getElementById('nav-user-name').textContent    = perfil.nome;
-    document.getElementById('nav-badge').textContent        = perfil.perfil.toUpperCase();
-    const unidadeEl = document.getElementById('nav-user-unidade');
-    if (unidadeEl) unidadeEl.textContent = perfil.unidade || 'Restaurante Comunitário de Sobradinho';
-
-
+    document.getElementById('navTop').style.display = 'flex';
+    document.getElementById('nav-user-name').textContent = perfil.nome;
+    document.getElementById('nav-badge').textContent     = perfil.perfil.toUpperCase();
+    const unEl = document.getElementById('nav-user-unidade');
+    if (unEl) unEl.textContent = perfil.unidade || 'Restaurante Comunitário de Sobradinho';
     if (perfil.perfil === 'admin') {
-      document.getElementById('nav-admin-lnk').style.display = 'flex';
-    const mobileAdminLnk = document.getElementById('nav-admin-lnk-mobile');
-    if (mobileAdminLnk) mobileAdminLnk.style.display = 'flex';
+      ['nav-admin-lnk','nav-admin-lnk-mobile'].forEach(id => {
+        const el = document.getElementById(id); if(el) el.style.display='flex';
+      });
     }
     return true;
   }
 
-  async function sair() {
-    await sb.auth.signOut();
-    window.location.href = 'login.html';
-  }
-  let todosDados   = [];
-  let diasFiltro   = 7;
-  let periodoFiltro= '';
-
+  // ── CARREGAR DADOS ───────────────────────────────────────────
   async function carregarDados() {
-    const overlay = document.getElementById('overlay');
-    const msgEl   = document.getElementById('overlay-msg');
-    const btnRec  = document.getElementById('btn-recarregar');
-    const btnAtu  = document.getElementById('btn-atualizar');
-
+    const overlay  = document.getElementById('overlay');
+    const msgEl    = document.getElementById('overlay-msg');
+    const btnRec   = document.getElementById('btn-recarregar');
     overlay.classList.remove('oculto','erro');
-    msgEl.textContent    = 'Conectando ao banco de dados…';
+    msgEl.textContent = 'Conectando ao banco de dados…';
     btnRec.style.display = 'none';
-    btnAtu.classList.add('girando');
 
     try {
-      const { data: { session: sess } } = await sb.auth.getSession();
-      const token = sess?.access_token || SUPABASE_KEY;
-      const resp = await fetch(
-        `${SUPABASE_URL}/rest/v1/${TABELA}?select=*&order=created_at.desc&limit=2000`,
-        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${token}` } }
-      );
+      const rows = await fetch(
+        `${SUPABASE_URL}/rest/v1/respostas?select=*&order=created_at.desc`,
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${_token}`, 'Accept': 'application/json' } }
+      ).then(r => { if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      const json = await resp.json();
-
-      todosDados = json.map(d => ({ ...d, dataHora: new Date(d.created_at) }));
-
-      document.getElementById('ultima-atualizacao').textContent =
-        'Atualizado às ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-
-      renderizar(aplicarFiltros());
+      todosOsDados = Array.isArray(rows) ? rows : [];
+      calcularPeriodos();
+      renderizar();
       overlay.classList.add('oculto');
-
-    } catch (err) {
+    } catch(err) {
       overlay.classList.add('erro');
-      msgEl.innerHTML = `❌ Não foi possível conectar ao Supabase.<br><br>
-        Verifique a URL, a chave e as políticas RLS.<br><br>
-        <em style="font-size:11px;color:#999">Erro: ${err.message}</em>`;
-      btnRec.style.display = 'inline-block';
+      msgEl.innerHTML = `❌ Não foi possível carregar os dados.<br><small style="color:#999">${err.message}</small>`;
+      btnRec.style.display = 'block';
     }
-    btnAtu.classList.remove('girando');
   }
 
-  function aplicarFiltros() {
-    let dados = todosDados;
-    if (diasFiltro > 0) {
-      const corte = new Date();
-      corte.setDate(corte.getDate() - diasFiltro);
-      dados = dados.filter(d => d.dataHora >= corte);
-    }
-    if (periodoFiltro) dados = dados.filter(d => d.periodo === periodoFiltro);
-    return dados;
-  }
-
-  function filtrarDias(dias, btn) {
-    diasFiltro = dias;
-    document.querySelectorAll('.filtros-row .filtro-btn:not(.cafe):not(.almoco):not(.jantar):not(#btn-todos-periodo), .filtros-container .filtro-btn:not(.cafe):not(.almoco):not(.jantar):not(#btn-todos-periodo)').forEach(b => b.classList.remove('ativo'));
-    btn.classList.add('ativo');
-    renderizar(aplicarFiltros());
-  }
-
-  function filtrarPeriodo(periodo, btn) {
-    periodoFiltro = periodo;
-    document.querySelectorAll('.filtro-btn.cafe,.filtro-btn.almoco,.filtro-btn.jantar,#btn-todos-periodo').forEach(b => b.classList.remove('ativo'));
-    btn.classList.add('ativo');
-    renderizar(aplicarFiltros());
-  }
-
-  function classeNota(n) {
-    if (!n || n === 'null') return '';
-    if(['Ótima','Ótimo'].includes(n)) return 'otimo';
-    if(['Boa','Bom'].includes(n))     return 'bom';
-    if(n==='Regular')                 return 'regular';
-    return 'ruim';
-  }
-
-  function scoreNota(n) { return {'Ótima':100,'Ótimo':100,'Boa':75,'Bom':75,'Regular':40,'Ruim':0}[n]??0; }
-  function pct(n,t)     { return t===0?0:Math.round((n/t)*100); }
-  function fmtData(d)   { return d.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }
-  function cnt(dados, campo, notas) { return dados.filter(d=>notas.includes(d[campo])).length; }
-
-  function calcScore(dados) {
-    const s = dados.flatMap(d =>
-      [d.refeicao, d.atendimento, d.ambiente].filter(n => n && n !== 'null')
-    ).map(scoreNota);
-    return s.length ? Math.round(s.reduce((a,b)=>a+b,0)/s.length) : null;
-  }
-
-  function renderizar(dados) {
-    const total   = dados.length;
-    const totalAv = dados.reduce((a,d) =>
-      a + [d.refeicao, d.atendimento, d.ambiente].filter(n => n && n !== 'null').length, 0
-    );
+  // ── CALCULAR PERÍODOS ────────────────────────────────────────
+  function calcularPeriodos() {
     const hoje    = new Date();
+    const iniAt   = new Date(); iniAt.setDate(hoje.getDate() - diasFiltro);
+    const iniAnt  = new Date(); iniAnt.setDate(hoje.getDate() - diasFiltro*2);
+    const iniAtStr  = iniAt.toISOString().split('T')[0];
+    const iniAntStr = iniAnt.toISOString().split('T')[0];
+    const hojeStr   = hoje.toISOString().split('T')[0];
 
-    const totalPos  = dados.reduce((a,d)=>a+[d.refeicao,d.atendimento,d.ambiente].filter(n=>['Ótima','Ótimo','Boa','Bom'].includes(n)).length,0);
-    const totalReg  = dados.reduce((a,d)=>a+[d.refeicao,d.atendimento,d.ambiente].filter(n=>n==='Regular').length,0);
-    const totalRuim = dados.reduce((a,d)=>a+[d.refeicao,d.atendimento,d.ambiente].filter(n=>n==='Ruim').length,0);
-    const totalHoje = dados.filter(d=>d.dataHora.toDateString()===hoje.toDateString()).length;
-
-    const meioTempo = diasFiltro > 0 ? diasFiltro : 90;
-    const corte1    = new Date(); corte1.setDate(corte1.getDate() - meioTempo);
-    const corte2    = new Date(); corte2.setDate(corte2.getDate() - meioTempo * 2);
-    const dadosAnt  = todosDados.filter(d => d.dataHora >= corte2 && d.dataHora < corte1 && (!periodoFiltro || d.periodo === periodoFiltro));
-    const pctPosAtual= pct(totalPos, totalAv);
-    const pctPosAnt  = pct(dadosAnt.reduce((a,d)=>a+[d.refeicao,d.atendimento,d.ambiente].filter(n=>['Ótima','Ótimo','Boa','Bom'].includes(n)).length,0), dadosAnt.length*3);
-    const varPos     = pctPosAtual - pctPosAnt;
-
-    document.getElementById('kpi-total').textContent         = total;
-    document.getElementById('kpi-hoje').textContent          = `${totalHoje} hoje`;
-    document.getElementById('kpi-positivo').textContent      = pctPosAtual + '%';
-    document.getElementById('kpi-positivo-pct').textContent  = `${totalPos} avaliações`;
-    document.getElementById('kpi-regular').textContent       = totalReg;
-    document.getElementById('kpi-regular-pct').textContent   = `${pct(totalReg,totalAv)}% das avaliações`;
-    document.getElementById('kpi-ruim').textContent          = totalRuim;
-    document.getElementById('kpi-ruim-pct').textContent      = `${pct(totalRuim,totalAv)}% das avaliações`;
-
-    const varEl = document.getElementById('kpi-positivo-var');
-    if (dadosAnt.length > 0 && varPos !== 0) {
-      varEl.textContent = `${varPos > 0 ? '▲' : '▼'} ${Math.abs(varPos)}% vs período anterior`;
-      varEl.className   = `kpi-variacao ${varPos > 0 ? 'sobe' : 'desce'}`;
-    } else {
-      varEl.textContent = 'Sem histórico anterior';
-      varEl.className   = 'kpi-variacao neutro';
-      varEl.title       = 'Ainda não há dados suficientes no período anterior para comparar. Disponível após acumular mais respostas.';
-    }
-
-    [
-      {cod:'ref',campo:'refeicao',    ot:['Ótima'],bm:['Boa']},
-      {cod:'ate',campo:'atendimento', ot:['Ótimo'],bm:['Bom']},
-      {cod:'amb',campo:'ambiente',    ot:['Ótimo'],bm:['Bom']}
-    ].forEach(({cod,campo,ot,bm}) => {
-      const o=cnt(dados,campo,ot), b=cnt(dados,campo,bm), r=cnt(dados,campo,['Regular']), rm=cnt(dados,campo,['Ruim']), t=total||1;
-      document.getElementById(`bar-${cod}-ot`).style.width=pct(o,t)+'%';
-      document.getElementById(`bar-${cod}-bm`).style.width=pct(b,t)+'%';
-      document.getElementById(`bar-${cod}-rg`).style.width=pct(r,t)+'%';
-      document.getElementById(`bar-${cod}-rm`).style.width=pct(rm,t)+'%';
-      document.getElementById(`pct-${cod}`).textContent=`${pct(o+b,t)}% satisfeitos`;
-      // stats breakdown
-      document.getElementById(`stat-${cod}-ot-p`).textContent=pct(o,t)+'%';
-      document.getElementById(`stat-${cod}-ot-n`).textContent=o+' resp.';
-      document.getElementById(`stat-${cod}-bm-p`).textContent=pct(b,t)+'%';
-      document.getElementById(`stat-${cod}-bm-n`).textContent=b+' resp.';
-      document.getElementById(`stat-${cod}-rg-p`).textContent=pct(r,t)+'%';
-      document.getElementById(`stat-${cod}-rg-n`).textContent=r+' resp.';
-      document.getElementById(`stat-${cod}-rm-p`).textContent=pct(rm,t)+'%';
-      document.getElementById(`stat-${cod}-rm-n`).textContent=rm+' resp.';
+    dadosAtual = todosOsDados.filter(r => {
+      const d = r.created_at?.substring(0,10); return d >= iniAtStr && d <= hojeStr;
+    });
+    dadosAnt = todosOsDados.filter(r => {
+      const d = r.created_at?.substring(0,10); return d >= iniAntStr && d < iniAtStr;
     });
 
-    const scoreMedia = calcScore(dados) ?? 0;
-    document.getElementById('score-num').textContent              = scoreMedia;
-    document.getElementById('score-fill').style.strokeDashoffset  = 345-(345*scoreMedia/100);
+    // Tag de período
+    document.getElementById('tag-periodo').textContent =
+      iniAt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}) + ' – ' +
+      hoje.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  }
 
-    let cor='#059669', badgeClass='excelente', badgeText='EXCELENTE';
-    if(scoreMedia < 40) { cor='#e11d48'; badgeClass='critico';  badgeText='CRÍTICO'; }
-    else if(scoreMedia < 60) { cor='#d97706'; badgeClass='regular';  badgeText='REGULAR'; }
-    else if(scoreMedia < 75) { cor='#d97706'; badgeClass='bom';      badgeText='BOM'; }
-    else if(scoreMedia < 90) { cor='#10b981'; badgeClass='muitobom'; badgeText='MUITO BOM'; }
+  // ── RENDERIZAR ───────────────────────────────────────────────
+  function renderizar() {
+    renderKPIs();
+    renderEvolucao();
+    renderDonutRef();
+    renderMediaCat();
+    renderDistrib();
+    renderNegDia();
+    renderPeriodo();
+    renderTopObs();
+    renderInsights();
+    renderAlertas();
+    renderAtencao();
+    renderUltimasNeg();
+    document.getElementById('data-atual').textContent =
+      new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  }
 
-    document.getElementById('score-fill').style.stroke = cor;
-    document.getElementById('score-num').style.color   = cor;
-    const badgeEl = document.getElementById('score-badge');
-    badgeEl.textContent = badgeText;
-    badgeEl.className   = `score-badge ${badgeClass}`;
+  // ── KPIs ─────────────────────────────────────────────────────
+  function renderKPIs() {
+    const d = dadosAtual, da = dadosAnt;
 
-    // Cards de período
-    const periodos = [
-      {id:'cafe',   nome:'Café da Manhã', icone:'☕', chave:'Café da Manhã'},
-      {id:'almoco', nome:'Almoço',        icone:'🍛', chave:'Almoço'},
-      {id:'jantar', nome:'Jantar',        icone:'🍲', chave:'Jantar'}
-    ];
+    // Satisfação
+    const sat  = calcPctPos(d);
+    const satA = calcPctPos(da);
+    document.getElementById('kpi-sat').textContent   = sat !== null ? sat+'%' : '—';
+    document.getElementById('kpi-sat-var').innerHTML = varTag(sat, satA);
 
-    const basePeriodo = diasFiltro > 0
-      ? todosDados.filter(d=>{ const c=new Date(); c.setDate(c.getDate()-diasFiltro); return d.dataHora>=c; })
-      : todosDados;
+    // Média
+    const med  = calcMedia(d);
+    const medA = calcMedia(da);
+    document.getElementById('kpi-media').textContent   = med !== null ? med.toFixed(2).replace('.',',') : '—';
+    document.getElementById('kpi-media-var').innerHTML = varTag(med ? +med.toFixed(2) : null, medA ? +medA.toFixed(2) : null);
 
-    document.getElementById('periodo-cards').innerHTML = periodos.map(p => {
-      const dp  = basePeriodo.filter(d => d.periodo === p.chave);
-      const sc  = calcScore(dp);
-      const val = sc !== null ? sc : 0;
-      // circunferência = 2π×36 ≈ 226
-      const offset = 226 - (226 * val / 100);
-      // Contagem correta: por avaliação individual (3 por resposta)
-      const totalAvals = dp.reduce((a,d) =>
-        a + [d.refeicao, d.atendimento, d.ambiente].filter(n => n && n !== 'null').length, 0
-      );
-      const nPos = dp.reduce((a,d) => a +
-        [d.refeicao,d.atendimento,d.ambiente]
-          .filter(n => ['Ótima','Ótimo','Boa','Bom'].includes(n)).length, 0);
-      const nNeg = dp.reduce((a,d) => a +
-        [d.refeicao,d.atendimento,d.ambiente]
-          .filter(n => ['Regular','Ruim'].includes(n)).length, 0);
-      const semDados = dp.length === 0;
-      return `<div class="periodo-card ${p.id}">
-        <div class="p-nome">${p.icone} ${p.nome}</div>
-        <div class="p-anel">
-          <svg viewBox="0 0 90 90" width="90" height="90">
-            <circle class="p-track" cx="45" cy="45" r="36"/>
-            <circle class="p-fill" cx="45" cy="45" r="36"
-                    style="stroke-dashoffset:${semDados ? 226 : offset}"/>
-          </svg>
-          <div class="p-anel-texto">
-            <div class="p-anel-num">${sc !== null ? sc : '—'}</div>
-            ${sc !== null ? '<div class="p-anel-unid">/ 100</div>' : ''}
-          </div>
-        </div>
-        ${semDados
-          ? '<p class="p-sem-dados">Sem respostas no período</p>'
-          : `<div class="p-stats-row">
-              <div class="p-stat-mini tot"><span class="p-stat-val">${dp.length}</span><div class="p-stat-lbl">Respostas</div></div>
-              <div class="p-stat-mini pos"><span class="p-stat-val">${pct(nPos,totalAvals)}%</span><div class="p-stat-lbl">Satisfeitas</div></div>
-              <div class="p-stat-mini neg"><span class="p-stat-val">${pct(nNeg,totalAvals)}%</span><div class="p-stat-lbl">Negativas</div></div>
-            </div>`
+    // Total
+    document.getElementById('kpi-total').textContent   = d.length;
+    document.getElementById('kpi-total-var').innerHTML = varTag(d.length, da.length);
+
+    // Negativas
+    const neg  = calcPctNeg(d);
+    const negA = calcPctNeg(da);
+    document.getElementById('kpi-neg').textContent   = neg !== null ? neg+'%' : '—';
+    document.getElementById('kpi-neg-var').innerHTML = varTag(neg, negA, true); // menor = melhor
+
+    // Sparklines
+    const dias    = diasRange(diasFiltro);
+    const porDia  = agruparPorDia(dadosAtual);
+
+    renderSparkline('spark-sat',   dias, d => { const v=calcPctPos(d??[]); return v; }, porDia, '#059669');
+    renderSparkline('spark-media', dias, d => { const v=calcMedia(d??[]); return v ? +v.toFixed(2) : null; }, porDia, '#7c3aed');
+    renderSparkline('spark-total', dias, d => (d??[]).length, porDia, '#1a3a6e');
+    renderSparkline('spark-neg',   dias, d => { const v=calcPctNeg(d??[]); return v; }, porDia, '#e11d48');
+  }
+
+  function renderSparkline(id, dias, fn, porDia, cor) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const chart = Chart.getChart(canvas);
+    if (chart) chart.destroy();
+
+    const dados = dias.map(d => fn(porDia[d]));
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: dias,
+        datasets: [{ data: dados, borderColor: cor, borderWidth: 1.5,
+          fill: true, backgroundColor: cor+'22',
+          pointRadius: 0, tension: 0.4 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: {display:false}, tooltip: {enabled:false} },
+        scales: { x: {display:false}, y: {display:false, beginAtZero:true} },
+        animation: false
+      }
+    });
+  }
+
+  // ── EVOLUÇÃO ─────────────────────────────────────────────────
+  function renderEvolucao() {
+    const dias   = diasRange(diasFiltro);
+    const porDia = agruparPorDia(dadosAtual);
+    const satDia = dias.map(d => calcPctPos(porDia[d]??[]));
+    const medDia = dias.map(d => { const v=calcMedia(porDia[d]??[]); return v ? +v.toFixed(2) : null; });
+    const labels = dias.map(d => d.substring(5).replace('-','/'));
+
+    if (cEvolucao) cEvolucao.destroy();
+    const ctx = document.getElementById('chart-evolucao').getContext('2d');
+    cEvolucao = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Satisfação % (Ótimo+Bom)', data: satDia,
+            borderColor: '#059669', backgroundColor: '#05966922',
+            borderWidth: 2, fill: true, tension: 0.4, pointRadius: 3,
+            pointBackgroundColor: '#059669', yAxisID: 'y1' },
+          { label: 'Média geral (1-4)', data: medDia,
+            borderColor: '#1a3a6e', backgroundColor: 'transparent',
+            borderWidth: 1.5, borderDash: [4,3], tension: 0.4,
+            pointRadius: 3, pointBackgroundColor: '#1a3a6e', yAxisID: 'y2' }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: true, position: 'top',
+            labels: { boxWidth: 10, font: { size: 11 }, color: '#475569' } }
+        },
+        scales: {
+          y1: { type:'linear', position:'left', beginAtZero:true, max:100,
+            ticks: { callback: v=>v+'%', font:{size:10}, color:'#94a3b8' },
+            grid: { color:'rgba(0,0,0,0.05)' } },
+          y2: { type:'linear', position:'right', min:1, max:4,
+            ticks: { font:{size:10}, color:'#94a3b8' },
+            grid: { display: false } },
+          x: { ticks: { font:{size:10}, color:'#94a3b8' }, grid:{display:false} }
         }
+      }
+    });
+  }
+
+  // ── DONUT REFEIÇÃO ───────────────────────────────────────────
+  function renderDonutRef() {
+    const d = dadosAtual;
+    const cont = { cafe:0, almoco:0, jantar:0 };
+    d.forEach(r => { if(cont[r.periodo]!==undefined) cont[r.periodo]++; });
+    const total = d.length;
+
+    if (cRef) cRef.destroy();
+    const ctx = document.getElementById('chart-ref').getContext('2d');
+    cRef = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        datasets: [{ data: [cont.almoco, cont.cafe, cont.jantar],
+          backgroundColor: ['#2563eb','#ea580c','#7c3aed'],
+          borderWidth: 2, borderColor: '#fff', hoverOffset: 4 }]
+      },
+      options: { responsive:true, maintainAspectRatio:false, cutout:'65%',
+        plugins: { legend:{display:false}, tooltip:{enabled:true} } }
+    });
+
+    document.getElementById('ref-total').textContent = total;
+
+    const itens = [
+      ['Almoço',       cont.almoco, '#2563eb'],
+      ['Café da Manhã',cont.cafe,   '#ea580c'],
+      ['Jantar',       cont.jantar, '#7c3aed'],
+    ];
+    document.getElementById('leg-ref').innerHTML = itens.map(([n,v,c]) =>
+      `<div class="leg-item">
+        <div class="leg-cor" style="background:${c}"></div>
+        <span class="leg-txt">${n}</span>
+        <span class="leg-val">${v}</span>
+        <span class="leg-pct">(${pctStr(v,total)})</span>
+      </div>`
+    ).join('');
+  }
+
+  // ── MÉDIA POR CATEGORIA ──────────────────────────────────────
+  function renderMediaCat() {
+    const d = dadosAtual;
+    const cats = [
+      { nome: 'Atendimento', campo: 'atendimento', cor: '#2563eb' },
+      { nome: 'Ambiente',    campo: 'ambiente',    cor: '#059669' },
+      { nome: 'Refeição',    campo: 'refeicao',    cor: '#7c3aed' },
+    ];
+    document.getElementById('cat-lista').innerHTML = cats.map(c => {
+      const v = calcMediaCat(d, c.campo);
+      const w = v !== null ? (v/4*100) : 0;
+      return `<div class="cat-item">
+        <span class="cat-nome">${c.nome}</span>
+        <div class="cat-barra-wrap"><div class="cat-barra" style="width:${w}%;background:${c.cor}"></div></div>
+        <span class="cat-val">${v !== null ? v.toFixed(2).replace('.',',') : '—'}</span>
+        <span class="cat-star">★</span>
       </div>`;
     }).join('');
+  }
 
-    // Destaque crítico / melhor
-    const categorias = [
-      {nome:'Refeição',   emoji:'🍽️', ruim:cnt(dados,'refeicao',['Ruim']),    reg:cnt(dados,'refeicao',['Regular']),    t:total},
-      {nome:'Atendimento',emoji:'👋', ruim:cnt(dados,'atendimento',['Ruim']), reg:cnt(dados,'atendimento',['Regular']), t:total},
-      {nome:'Ambiente',   emoji:'🧹', ruim:cnt(dados,'ambiente',['Ruim']),    reg:cnt(dados,'ambiente',['Regular']),    t:total}
+  // ── DISTRIBUIÇÃO ─────────────────────────────────────────────
+  function renderDistrib() {
+    const d = dadosAtual;
+    const cont = {'Ótimo':0,'Bom':0,'Regular':0,'Ruim':0};
+    d.forEach(r => [r.refeicao,r.atendimento,r.ambiente].forEach(n => {
+      if (!notaValida(n)) return;
+      if (['Ótima','Ótimo'].includes(n)) cont['Ótimo']++;
+      else if (['Boa','Bom'].includes(n)) cont['Bom']++;
+      else if (n==='Regular') cont['Regular']++;
+      else if (n==='Ruim') cont['Ruim']++;
+    }));
+    const total = Object.values(cont).reduce((a,b)=>a+b,0);
+
+    if (cDistrib) cDistrib.destroy();
+    const ctx = document.getElementById('chart-distrib').getContext('2d');
+    cDistrib = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        datasets: [{ data: [cont['Ótimo'],cont['Bom'],cont['Regular'],cont['Ruim']],
+          backgroundColor: ['#059669','#10b981','#d97706','#e11d48'],
+          borderWidth: 2, borderColor: '#fff', hoverOffset: 3 }]
+      },
+      options: { responsive:true, maintainAspectRatio:false, cutout:'62%',
+        plugins: { legend:{display:false} } }
+    });
+    document.getElementById('distrib-total').textContent = total;
+
+    const itens = [
+      ['Ótimo',  cont['Ótimo'],  '#059669'],
+      ['Bom',    cont['Bom'],    '#10b981'],
+      ['Regular',cont['Regular'],'#d97706'],
+      ['Ruim',   cont['Ruim'],   '#e11d48'],
     ];
+    document.getElementById('leg-distrib').innerHTML = itens.map(([n,v,c]) =>
+      `<div class="leg-item">
+        <div class="leg-cor" style="background:${c}"></div>
+        <span class="leg-txt">${n}</span>
+        <span class="leg-val">${v}</span>
+        <span class="leg-pct">(${pctStr(v,total)})</span>
+      </div>`
+    ).join('');
+  }
 
-    const critico = [...categorias].sort((a,b)=>(b.ruim+b.reg)-(a.ruim+a.reg))[0];
-    const melhor  = [...categorias].sort((a,b)=>(a.ruim+a.reg)-(b.ruim+b.reg))[0];
+  // ── NEGATIVAS POR DIA ────────────────────────────────────────
+  function renderNegDia() {
+    const dias   = diasRange(diasFiltro);
+    const porDia = agruparPorDia(dadosAtual);
+    const negDia = dias.map(d => {
+      const g = porDia[d] ?? [];
+      return g.reduce((a,r)=>a+[r.refeicao,r.atendimento,r.ambiente].filter(n=>n==='Ruim').length,0);
+    });
+    const labels = dias.map(d => d.substring(5).replace('-','/'));
 
-    document.getElementById('destaque-critico').innerHTML = critico && (critico.ruim+critico.reg) > 0
-      ? `<div class="destaque-critico"><div class="dc-icone">${critico.emoji}</div><div class="dc-texto"><strong>Atenção: ${critico.nome}</strong><span>${pct(critico.ruim+critico.reg,critico.t)}% de avaliações negativas. Priorize ações nesta área.</span></div></div>`
-      : `<div class="destaque-ok"><div class="dc-icone">✅</div><div class="dc-texto"><strong>Tudo sob controle</strong><span>Nenhuma categoria crítica no período.</span></div></div>`;
+    if (cNegDia) cNegDia.destroy();
+    const ctx = document.getElementById('chart-neg-dia').getContext('2d');
+    cNegDia = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          data: negDia, label: 'Ruim',
+          borderColor: '#e11d48', backgroundColor: '#e11d4822',
+          borderWidth: 2, fill: true, tension: 0.4,
+          pointRadius: 3, pointBackgroundColor: '#e11d48'
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend:{display:false} },
+        scales: {
+          y: { beginAtZero:true, ticks:{stepSize:1,font:{size:9},color:'#94a3b8'}, grid:{color:'rgba(0,0,0,0.05)'} },
+          x: { ticks:{font:{size:9},color:'#94a3b8'}, grid:{display:false} }
+        }
+      }
+    });
+  }
 
-    document.getElementById('destaque-melhor').innerHTML = melhor && total > 0
-      ? `<div class="destaque-ok" style="margin-top:10px"><div class="dc-icone">${melhor.emoji}</div><div class="dc-texto"><strong>Destaque: ${melhor.nome}</strong><span>${pct(melhor.t-melhor.ruim-melhor.reg,melhor.t)}% de satisfação — melhor do período.</span></div></div>`
-      : '';
+  // ── POR PERÍODO DO DIA ───────────────────────────────────────
+  function renderPeriodo() {
+    const d = dadosAtual;
+    const per = { cafe:0, almoco:0, jantar:0 };
+    d.forEach(r => { if(per[r.periodo]!==undefined) per[r.periodo]++; });
+    const total = d.length;
 
-    // Tendência
-    const semana = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-    const dias7  = Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-(6-i));return d;});
-    const maxDia = Math.max(...dias7.map(dia=>todosDados.filter(r=>r.dataHora.toDateString()===dia.toDateString()).length),1);
-    document.getElementById('tendencia-grid').innerHTML = dias7.map(dia=>{
-      const count  = todosDados.filter(r=>r.dataHora.toDateString()===dia.toDateString()).length;
-      const altura = Math.max((count/maxDia)*100,4);
-      const isHoje = dia.toDateString()===hoje.toDateString();
-      return `<div class="dia-col"><div class="dia-total">${count}</div><div class="dia-barra-wrap"><div class="dia-barra" style="height:${altura}%;background:${isHoje?'#2563eb':'#bfdbfe'}"></div></div><div class="dia-label">${semana[dia.getDay()]}</div></div>`;
+    const itens = [
+      { nome:'Manhã (06h – 11h)', chave:'cafe',   cor:'#2563eb' },
+      { nome:'Tarde (11h – 17h)', chave:'almoco', cor:'#059669' },
+      { nome:'Noite (17h – 22h)', chave:'jantar', cor:'#7c3aed' },
+    ];
+    document.getElementById('per-lista').innerHTML = itens.map(p => {
+      const v = per[p.chave];
+      const w = pct(v, total);
+      return `<div class="per-item">
+        <span class="per-nome">${p.nome}</span>
+        <div class="per-barra-wrap">
+          <div class="per-barra" style="width:${w}%;background:${p.cor}">${w>10?w+'%':''}</div>
+        </div>
+        <span class="per-val">${v} (${w}%)</span>
+      </div>`;
     }).join('');
+  }
 
-    // Alertas
-    const negativos  = dados.filter(d=>['Regular','Ruim'].includes(d.refeicao)||['Regular','Ruim'].includes(d.atendimento)||['Regular','Ruim'].includes(d.ambiente)).slice(0,8);
-    const periodoCls = {'Café da Manhã':'cafe','Almoço':'almoco','Jantar':'jantar'};
+  // ── TOP OBSERVAÇÕES ──────────────────────────────────────────
+  function renderTopObs() {
+    const stop = new Set(['de','a','o','e','em','para','com','que','do','da','no','na',
+      'um','uma','os','as','se','foi','por','mais','mas','não','já','bem',
+      'este','esta','como','quando','sobre','sua','seu','ela','ele','me','te',
+      'nos','lhe','também','ainda','assim','então','muito','tem','são','isso',
+      'isso','aqui','ali','tudo','esta','esse','ao','dos','das','às','numa',
+      'neste','nessa','pelo','pela','entre','cada','todo','toda','após','está']);
 
-    document.getElementById('alertas-lista').innerHTML = negativos.length === 0
-      ? '<p style="color:var(--tx3);font-size:13px;text-align:center;padding:20px 0">Nenhuma avaliação negativa no período 🎉</p>'
-      : negativos.map(r=>{
-          const cats=[];
-          if(['Regular','Ruim'].includes(r.refeicao))    cats.push(`🍽️ ${r.refeicao}`);
-          if(['Regular','Ruim'].includes(r.atendimento)) cats.push(`👋 ${r.atendimento}`);
-          if(['Regular','Ruim'].includes(r.ambiente))    cats.push(`🧹 ${r.ambiente}`);
-          const pior = [r.refeicao,r.atendimento,r.ambiente].includes('Ruim')?'ruim':'regular';
-          return `<div class="alerta-item ${pior}">
-            <div class="alerta-header">
-              <span class="alerta-nota ${pior}">${pior==='ruim'?'RUIM':'REGULAR'}</span>
-              ${r.periodo?`<span class="alerta-periodo">${r.periodo}</span>`:''}
-              <span class="alerta-data">${fmtData(r.dataHora)}</span>
-            </div>
-            <div class="alerta-categorias">${cats.join(' · ')}</div>
-            ${r.observacoes?`<div class="alerta-obs">"${r.observacoes}"</div>`:''}
-          </div>`;
-        }).join('');
+    const freq = {};
+    dadosAtual.forEach(r => {
+      if (!r.observacoes?.trim()) return;
+      r.observacoes.toLowerCase()
+        .replace(/[^a-záàâãéèêíïóôõöúüç\s]/gi,' ')
+        .split(/\s+/)
+        .filter(w => w.length>3 && !stop.has(w))
+        .forEach(w => { freq[w]=(freq[w]||0)+1; });
+    });
 
-    // Tabela
-    const periodoCss = {'Café da Manhã':'cafe','Almoço':'almoco','Jantar':'jantar'};
-    document.getElementById('tabela-corpo').innerHTML = dados.slice(0,15).map(r=>`
+    const top = Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const max = top[0]?.[1] || 1;
+
+    if (!top.length) {
+      document.getElementById('obs-lista').innerHTML = '<div class="empty">Sem observações no período</div>';
+      return;
+    }
+
+    document.getElementById('obs-lista').innerHTML = top.map(([w,cnt]) =>
+      `<div class="obs-item">
+        <span class="obs-palavra">${w}</span>
+        <div class="obs-barra-wrap"><div class="obs-barra" style="width:${pct(cnt,max)}%"></div></div>
+        <span class="obs-cnt">${cnt}</span>
+      </div>`
+    ).join('');
+  }
+
+  // ── INSIGHTS AUTOMÁTICOS ─────────────────────────────────────
+  function renderInsights() {
+    const d = dadosAtual, da = dadosAnt;
+    const insights = [];
+
+    const sat  = calcPctPos(d);
+    const satA = calcPctPos(da);
+    if (sat !== null && satA !== null) {
+      const diff = sat - satA;
+      if (diff >= 0)
+        insights.push({icon:'📈', txt:`A satisfação geral aumentou ${diff}% em comparação ao período anterior.`});
+      else
+        insights.push({icon:'📉', txt:`A satisfação geral caiu ${Math.abs(diff)}% em comparação ao período anterior.`});
+    }
+
+    // Melhor refeição
+    const mediasRef = ['cafe','almoco','jantar'].map(p => ({
+      p, v: calcMedia(d.filter(r=>r.periodo===p))
+    })).filter(x=>x.v!==null).sort((a,b)=>b.v-a.v);
+    if (mediasRef.length) {
+      const best = mediasRef[0];
+      const semanas = Math.round(diasFiltro/7);
+      insights.push({icon:'🏆', txt:`${nomePeriodo(best.p)} mantém o melhor desempenho no período (média ${best.v.toFixed(2).replace('.',',')}).`});
+    }
+
+    // Avaliações negativas crescendo?
+    const neg  = calcPctNeg(d);
+    const negA = calcPctNeg(da);
+    if (neg !== null && negA !== null && neg > negA)
+      insights.push({icon:'⚠️', txt:`As avaliações negativas aumentaram ${neg-negA}% e merecem atenção.`});
+
+    // Categoria mais fraca
+    const cats = [
+      {nome:'Atendimento', v: calcMediaCat(d,'atendimento')},
+      {nome:'Ambiente',    v: calcMediaCat(d,'ambiente')},
+      {nome:'Refeição',    v: calcMediaCat(d,'refeicao')},
+    ].filter(c=>c.v!==null).sort((a,b)=>a.v-b.v);
+    if (cats.length && cats[0].v < 2.5)
+      insights.push({icon:'🔍', txt:`A categoria "${cats[0].nome}" tem a menor média (${cats[0].v.toFixed(2).replace('.',',')}). Requer atenção especial.`});
+
+    if (!insights.length)
+      insights.push({icon:'✅', txt:'Sem alertas críticos no período. Continue monitorando.'});
+
+    document.getElementById('insight-lista').innerHTML = insights.map(i =>
+      `<div class="insight-item">
+        <div class="insight-icone">${i.icon}</div>
+        <div class="insight-txt">${i.txt}</div>
+      </div>`
+    ).join('');
+  }
+
+  // ── ALERTAS ──────────────────────────────────────────────────
+  function renderAlertas() {
+    const d = dadosAtual;
+    const alertas = [];
+
+    // Por refeição — ruim > 15%
+    ['cafe','almoco','jantar'].forEach(p => {
+      const g = d.filter(r=>r.periodo===p);
+      const neg = calcPctNeg(g);
+      if (neg !== null && neg > 15)
+        alertas.push({ tipo:'critico', icon:'🔴',
+          titulo: `Aumento de avaliações ruins — ${nomePeriodo(p)}`,
+          desc: `${neg}% das avaliações de ${nomePeriodo(p)} são "Ruim" no período.` });
+    });
+
+    // Categoria ambiente caindo
+    const ambAt  = calcMediaCat(d,  'ambiente');
+    const ambAnt = calcMediaCat(dadosAnt, 'ambiente');
+    if (ambAt!==null && ambAnt!==null && ambAt < ambAnt)
+      alertas.push({ tipo:'atencao', icon:'🟡',
+        titulo: 'Queda na avaliação do Ambiente',
+        desc: `A média do ambiente caiu ${(ambAnt-ambAt).toFixed(2).replace('.',',')} pontos em relação ao período anterior.` });
+
+    // Alto volume de observações negativas
+    const obsNeg = d.filter(r => r.observacoes?.trim() &&
+      [r.refeicao,r.atendimento,r.ambiente].some(n=>['Regular','Ruim'].includes(n))).length;
+    if (obsNeg >= 5)
+      alertas.push({ tipo:'info', icon:'🔵',
+        titulo: 'Grande volume de observações',
+        desc: `${obsNeg} respostas possuem comentários sobre problemas no período.` });
+
+    if (!alertas.length)
+      alertas.push({ tipo:'info', icon:'✅',
+        titulo: 'Nenhum alerta no período',
+        desc: 'Os indicadores estão dentro dos limites esperados.' });
+
+    document.getElementById('alerta-lista').innerHTML = alertas.map(a =>
+      `<div class="alerta-item ${a.tipo}">
+        <div class="alerta-icone">${a.icon}</div>
+        <div class="alerta-corpo">
+          <div class="alerta-titulo">${a.titulo}</div>
+          <div class="alerta-desc">${a.desc}</div>
+        </div>
+        <button class="btn-det" onclick="location.href='respostas.html'">Ver detalhes</button>
+      </div>`
+    ).join('');
+  }
+
+  // ── ATENÇÃO IMEDIATA ─────────────────────────────────────────
+  function renderAtencao() {
+    const d = dadosAtual;
+    const neg = d.filter(r =>
+      r.observacoes?.trim() &&
+      [r.refeicao,r.atendimento,r.ambiente].some(n=>['Regular','Ruim'].includes(n))
+    ).slice(0, 10);
+
+    document.getElementById('badge-aten').textContent = neg.length;
+
+    if (!neg.length) {
+      document.getElementById('tab-aten-body').innerHTML =
+        '<tr><td colspan="6" class="empty">Nenhuma ocorrência no período ✅</td></tr>';
+      return;
+    }
+
+    document.getElementById('tab-aten-body').innerHTML = neg.map(r => `
       <tr>
-        <td class="data-cell">${fmtData(r.dataHora)}</td>
-        <td>${r.periodo?`<span class="periodo-badge ${periodoCss[r.periodo]||'almoco'}">${r.periodo}</span>`:'—'}</td>
-        <td>${r.refeicao    ? `<span class="nota-badge ${classeNota(r.refeicao)}">${r.refeicao}</span>`       : '<em style="color:var(--tx3)">—</em>'}</td>
-        <td>${r.atendimento ? `<span class="nota-badge ${classeNota(r.atendimento)}">${r.atendimento}</span>` : '<em style="color:var(--tx3)">—</em>'}</td>
-        <td>${r.ambiente    ? `<span class="nota-badge ${classeNota(r.ambiente)}">${r.ambiente}</span>`       : '<em style="color:var(--tx3)">—</em>'}</td>
-        <td class="obs-cell">${r.observacoes||'<em style="color:var(--tx3)">—</em>'}</td>
+        <td class="td-data">${fmt(r.created_at)}</td>
+        <td><span class="ref-badge ${classeRef(r.periodo)}">${nomePeriodo(r.periodo)}</span></td>
+        <td>${celulaNota(r.refeicao)}</td>
+        <td>${celulaNota(r.atendimento)}</td>
+        <td>${celulaNota(r.ambiente)}</td>
+        <td class="td-obs-txt" title="${r.observacoes||''}">${r.observacoes||'—'}</td>
       </tr>`).join('');
   }
 
-  // Aguarda o DOM completo — nav.js precisa do body para injetar a nav
-  document.getElementById('data-atual').textContent =
-    new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  // ── ÚLTIMAS AVALIAÇÕES NEGATIVAS ─────────────────────────────
+  function renderUltimasNeg() {
+    const d = dadosAtual;
+    const neg = d.filter(r =>
+      [r.refeicao,r.atendimento,r.ambiente].some(n=>n==='Ruim')
+    ).slice(0, 15);
 
+    document.getElementById('badge-neg').textContent = neg.length;
+
+    if (!neg.length) {
+      document.getElementById('tab-neg-body').innerHTML =
+        '<tr><td colspan="7" class="empty">Nenhuma avaliação "Ruim" no período ✅</td></tr>';
+      return;
+    }
+
+    document.getElementById('tab-neg-body').innerHTML = neg.map(r => `
+      <tr>
+        <td class="td-data">${fmt(r.created_at)}</td>
+        <td><span class="ref-badge ${classeRef(r.periodo)}">${nomePeriodo(r.periodo)}</span></td>
+        <td>${celulaNota(r.refeicao)}</td>
+        <td>${celulaNota(r.atendimento)}</td>
+        <td>${celulaNota(r.ambiente)}</td>
+        <td class="td-data">${r.nome||'Anônimo'}</td>
+        <td class="td-obs-txt" title="${r.observacoes||''}">${r.observacoes||'—'}</td>
+      </tr>`).join('');
+  }
+
+  // ── FILTRO DE PERÍODO ────────────────────────────────────────
+  function setDias(n) {
+    diasFiltro = n;
+    ['btn7','btn30','btn90'].forEach(id => {
+      document.getElementById(id)?.classList.remove('ativo');
+    });
+    document.getElementById(`btn${n}`)?.classList.add('ativo');
+    calcularPeriodos();
+    renderizar();
+  }
+
+  // ── EXPORTAR CSV ─────────────────────────────────────────────
+  function exportarCSV() {
+    const cab = ['Data/Hora','Refeição','Avaliação','Atendimento','Ambiente','Nome','Observações'];
+    const fmt2 = ts => { if(!ts) return ''; const d=new Date(ts); return d.toLocaleString('pt-BR'); };
+    const linhas = dadosAtual.map(r =>
+      [fmt2(r.created_at), nomePeriodo(r.periodo),
+       r.refeicao||'', r.atendimento||'', r.ambiente||'',
+       r.nome||'Anônimo', r.observacoes||'']
+      .map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')
+    );
+    const csv  = '\uFEFF' + [cab.join(','), ...linhas].join('\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const hoje = new Date().toLocaleDateString('pt-BR').replace(/\//g,'-');
+    a.href=url; a.download=`dashboard_rc_${hoje}.csv`; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── SAIR ─────────────────────────────────────────────────────
+  async function sair() {
+    await sb.auth.signOut(); location.href='login.html';
+  }
+
+  // ── INICIAR ──────────────────────────────────────────────────
   initAuth().then(ok => {
     if (ok) {
       carregarDados();
-      setInterval(carregarDados, 5*60*1000);
+      setInterval(carregarDados, 5*60*1000); // auto-atualiza a cada 5 min
     }
   });
 </script>
