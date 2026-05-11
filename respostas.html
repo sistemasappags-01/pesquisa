@@ -251,11 +251,15 @@
     perfilUsuario = perfil;
     document.getElementById('navTop').style.display = 'flex';
     document.getElementById('nav-user-name').textContent   = perfil.nome;
+    const unidadeEl = document.getElementById('nav-user-unidade');
+    if (unidadeEl) unidadeEl.textContent = perfil.unidade || 'Restaurante Comunitário de Sobradinho';
     document.getElementById('nav-badge').textContent = perfil.perfil.toUpperCase();
 
     // Mostra link admin só para admin
     if (perfil.perfil === 'admin') {
       document.getElementById('nav-admin-lnk').style.display = 'flex';
+    const mobileAdminLnk = document.getElementById('nav-admin-lnk-mobile');
+    if (mobileAdminLnk) mobileAdminLnk.style.display = 'flex';
     }
 
     // Visualizador não vê dados pessoais

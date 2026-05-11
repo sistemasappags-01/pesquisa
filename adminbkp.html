@@ -202,8 +202,8 @@
   // ═══════════════════════════════════════════════════
   //  ⚠️  COLE AQUI AS SUAS CREDENCIAIS DO SUPABASE
   // ═══════════════════════════════════════════════════
-  const SUPABASE_URL = '';
-  const SUPABASE_KEY = '';
+  const SUPABASE_URL = 'https://kosiqdzgyutdsexclzvk.supabase.co'; // ← substitua pela sua URL
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2lxZHpneXV0ZHNleGNsenZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjQyMTIsImV4cCI6MjA5MzAwMDIxMn0.Aq4ZExIo8O82eB0B2-t8Nh-NyBfCm3sb1vRhutlLOFo'; // ← substitua pela sua anon key
   // ═══════════════════════════════════════════════════
 
   const { createClient } = supabase;
@@ -236,15 +236,11 @@
 
     meuId = session.user.id;
     document.getElementById('navTop').style.display = 'flex';
-    document.getElementById('nav-user-name').textContent    = perfil.nome;
+    document.getElementById('nav-user-name').textContent = perfil.nome;
     const badgeEl = document.getElementById('nav-badge');
     if (badgeEl) badgeEl.textContent = perfil.perfil.toUpperCase();
-    const unidadeEl = document.getElementById('nav-user-unidade');
-    if (unidadeEl) unidadeEl.textContent = perfil.unidade || 'Restaurante Comunitário de Sobradinho';
     const adminLnk = document.getElementById('nav-admin-lnk');
     if (adminLnk && perfil.perfil === 'admin') adminLnk.style.display = 'flex';
-    const mobileAdminLnk = document.getElementById('nav-admin-lnk-mobile');
-    if (mobileAdminLnk && perfil.perfil === 'admin') mobileAdminLnk.style.display = 'flex';
     carregarUsuarios();
   }
 
