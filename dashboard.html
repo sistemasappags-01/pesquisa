@@ -1318,12 +1318,16 @@
     _perfil = perfil;
     const nav = document.getElementById('navTop');
     nav.style.display = 'flex';
-    document.getElementById('nav-user-name').textContent = perfil.nome;
-    document.getElementById('nav-badge').textContent     = perfil.perfil.toUpperCase();
+    document.getElementById('nav-user-name').textContent    = perfil.nome;
+    document.getElementById('nav-badge').textContent        = perfil.perfil.toUpperCase();
+    const unidadeEl = document.getElementById('nav-user-unidade');
+    if (unidadeEl) unidadeEl.textContent = perfil.unidade || 'Restaurante Comunitário de Sobradinho';
 
 
     if (perfil.perfil === 'admin') {
       document.getElementById('nav-admin-lnk').style.display = 'flex';
+    const mobileAdminLnk = document.getElementById('nav-admin-lnk-mobile');
+    if (mobileAdminLnk) mobileAdminLnk.style.display = 'flex';
     }
     return true;
   }

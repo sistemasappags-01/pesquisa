@@ -5,7 +5,7 @@
 //  antes de incluir este script
 // ═══════════════════════════════════════════════════════════
 
-document.addEventListener('DOMContentLoaded', function () {
+(function () {
 
   // ── Logo SVG inline ──────────────────────────────────────
   const LOGO_SVG = `
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <div class="nav-links">
       <a class="nav-link ${ativo==='dashboard' ?'ativo':''}" href="dashboard.html">📊 Dashboard</a>
       <a class="nav-link ${ativo==='respostas' ?'ativo':''}" href="respostas.html">📋 Respostas</a>
-      <a class="nav-link admin-lnk ${ativo==='usuarios'?'ativo':''}" id="nav-admin-lnk" href="admin.html">👥 Usuários</a>
+      <a class="nav-link admin-lnk ${ativo==='usuarios'?'ativo':''}" id="nav-admin-lnk" href="admin.html">👤 Usuários</a>
     </div>
 
     <div class="nav-right">
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   </nav>`;
 
-  // Injeta no topo do body — DOM garantidamente pronto
+  // Injeta no topo do body
   document.body.insertAdjacentHTML('afterbegin', HTML);
 
-});
+})();
