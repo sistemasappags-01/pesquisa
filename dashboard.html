@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — RC Sobradinho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="favicon_sistema.svg">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --navy:     #1a3a6e;
+      --navy-d:   #0f2650;
+      --azul:     #2a5298;
+      --gold:     #f5c842;
+      --verde:    #059669;
+      --verde2:   #10b981;
+      --amarelo:  #d97706;
+      --vermelho: #e11d48;
+      --roxo:     #7c3aed;
+      --page:     #eef2f9;
+      --surface:  #ffffff;
+      --border:   #e2e8f0;
+      --tx1:      #0f172a;
+      --tx2:      #475569;
+      --tx3:      #94a3b8;
+      --shadow:   0 2px 10px rgba(26,58,110,0.09);
+      --shadow-lg:0 4px 24px rgba(26,58,110,0.13);
+      --radius:   12px;
+    }
+    @media(prefers-color-scheme:dark){
+      :root{
+        --page:#0a0f1e; --surface:#111827; --border:#1f2937;
+        --tx1:#f9fafb; --tx2:#9ca3af; --tx3:#6b7280;
+      }
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'DM Sans',system-ui,sans-serif;background:var(--page);color:var(--tx1);min-height:100vh;}
+
+    /* ── MAIN ── */
+    .main{max-width:1440px;margin:0 auto;padding:20px 20px 40px;}
+
+    /* ── PAGE HEADER ── */
+    .ph{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+    .ph-left h1{font-family:'Sora',sans-serif;font-size:24px;font-weight:800;color:var(--tx1);letter-spacing:-.4px;}
+    .ph-left p{font-size:13px;color:var(--tx2);margin-top:2px;}
+    .ph-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .btn-periodo{
+      display:flex;align-items:center;gap:6px;
+      padding:7px 13px;border-radius:8px;
+      border:1.5px solid var(--border);background:var(--surface);
+      font-size:12.5px;font-weight:600;color:var(--tx2);
+      cursor:pointer;font-family:inherit;transition:all .15s;
+    }
+    .btn-periodo.ativo,.btn-periodo:hover{border-color:var(--navy);color:var(--navy);background:rgba(26,58,110,.05);}
+    .btn-export{
+      display:flex;align-items:center;gap:5px;
+      padding:7px 13px;border-radius:8px;
+      border:1.5px solid var(--border);background:var(--surface);
+      font-size:12.5px;font-weight:600;color:var(--tx2);
+      cursor:pointer;font-family:inherit;transition:all .15s;
+    }
+    .btn-export:hover{border-color:var(--navy);color:var(--navy);}
+    .ph-divider{width:1px;height:24px;background:var(--border);}
+    .tag-data{font-size:12px;color:var(--tx3);padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;}
+
+    /* ── GRID HELPERS ── */
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+    .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+    .grid-524{display:grid;grid-template-columns:5fr 2fr 4fr;gap:14px;}
+    .grid-222-4{display:grid;grid-template-columns:2fr 2fr 2fr 4fr;gap:14px;}
+
+    /* ── CARD BASE ── */
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);}
+    .card-p{padding:16px 18px;}
+    .card-label{font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+    .card-label-gold::before{content:'';display:inline-block;width:3px;height:12px;background:var(--gold);border-radius:99px;margin-right:6px;vertical-align:middle;}
+
+    /* ── KPIs ── */
+    .kpi{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;}
+    .kpi-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+    .kpi-icon.verde{background:rgba(5,150,105,.10);}
+    .kpi-icon.roxo{background:rgba(124,58,237,.10);}
+    .kpi-icon.azul{background:rgba(26,58,110,.08);}
+    .kpi-icon.vermelho{background:rgba(225,29,72,.10);}
+    .kpi-body{flex:1;min-width:0;}
+    .kpi-label{font-size:12px;color:var(--tx2);margin-bottom:2px;}
+    .kpi-val{font-family:'Sora',sans-serif;font-size:28px;font-weight:800;color:var(--tx1);line-height:1;margin-bottom:4px;}
+    .kpi-sub{font-size:11px;color:var(--tx3);}
+    .kpi-var{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:700;margin-top:4px;}
+    .kpi-var.up{color:var(--verde);}
+    .kpi-var.down{color:var(--vermelho);}
+    .kpi-var.neu{color:var(--tx3);}
+    .kpi-spark{width:100%;height:36px;margin-top:6px;}
+
+    /* ── SECTION TITLE ── */
+    .sec-title{font-size:13px;font-weight:700;color:var(--tx1);display:flex;align-items:center;gap:6px;margin-bottom:14px;}
+    .sec-title::before{content:'';display:block;width:3px;height:15px;background:var(--gold);border-radius:99px;flex-shrink:0;}
+    .sec-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:rgba(26,58,110,.08);color:var(--navy);}
+
+    /* ── CHARTS ── */
+    .chart-wrap{position:relative;width:100%;}
+
+    /* ── MÉDIA POR CATEGORIA ── */
+    .cat-lista{display:flex;flex-direction:column;gap:10px;}
+    .cat-item{display:flex;align-items:center;gap:10px;}
+    .cat-nome{font-size:12.5px;color:var(--tx2);width:80px;flex-shrink:0;}
+    .cat-barra-wrap{flex:1;height:10px;background:var(--border);border-radius:99px;overflow:hidden;}
+    .cat-barra{height:100%;border-radius:99px;transition:width .6s ease;}
+    .cat-val{font-size:13px;font-weight:700;color:var(--tx1);width:30px;text-align:right;flex-shrink:0;}
+    .cat-star{color:var(--gold);font-size:11px;}
+    .cat-escala{font-size:10px;color:var(--tx3);margin-top:10px;text-align:right;}
+
+    /* ── TOP OBSERVAÇÕES ── */
+    .obs-lista{display:flex;flex-direction:column;gap:6px;}
+    .obs-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);}
+    .obs-item:last-child{border:none;}
+    .obs-palavra{font-size:12.5px;color:var(--tx2);flex:1;}
+    .obs-barra-wrap{width:80px;height:6px;background:var(--border);border-radius:99px;overflow:hidden;}
+    .obs-barra{height:100%;background:var(--navy);border-radius:99px;}
+    .obs-cnt{font-size:12px;font-weight:700;color:var(--tx1);width:24px;text-align:right;}
+
+    /* ── PERÍODO ── */
+    .per-lista{display:flex;flex-direction:column;gap:10px;}
+    .per-item{display:flex;align-items:center;gap:10px;}
+    .per-nome{font-size:11.5px;color:var(--tx2);width:120px;flex-shrink:0;line-height:1.3;}
+    .per-barra-wrap{flex:1;height:16px;background:var(--border);border-radius:6px;overflow:hidden;}
+    .per-barra{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:6px;font-size:9px;font-weight:700;color:#fff;transition:width .6s ease;}
+    .per-val{font-size:12px;font-weight:700;color:var(--tx1);width:56px;text-align:right;flex-shrink:0;}
+
+    /* ── DONUT LEGENDA ── */
+    .leg-wrap{display:flex;flex-direction:column;gap:7px;}
+    .leg-item{display:flex;align-items:center;gap:7px;}
+    .leg-cor{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .leg-txt{font-size:12px;color:var(--tx2);flex:1;}
+    .leg-val{font-size:12px;font-weight:700;color:var(--tx1);}
+    .leg-pct{font-size:11px;color:var(--tx3);}
+    .donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
+    .donut-num{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:var(--tx1);line-height:1;}
+    .donut-sub{font-size:10px;color:var(--tx3);}
+
+    /* ── INSIGHTS ── */
+    .insight-lista{display:flex;flex-direction:column;gap:10px;}
+    .insight-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--page);border-radius:8px;}
+    .insight-icone{font-size:16px;flex-shrink:0;margin-top:1px;}
+    .insight-txt{font-size:13px;color:var(--tx2);line-height:1.5;}
+
+    /* ── ALERTAS ── */
+    .alerta-lista{display:flex;flex-direction:column;gap:10px;}
+    .alerta-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;border:1px solid;}
+    .alerta-item.critico{background:rgba(225,29,72,.05);border-color:rgba(225,29,72,.20);}
+    .alerta-item.atencao{background:rgba(217,119,6,.05);border-color:rgba(217,119,6,.20);}
+    .alerta-item.info{background:rgba(26,58,110,.05);border-color:rgba(26,58,110,.15);}
+    .alerta-icone{font-size:18px;flex-shrink:0;}
+    .alerta-corpo{flex:1;}
+    .alerta-titulo{font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:2px;}
+    .alerta-desc{font-size:12px;color:var(--tx2);line-height:1.4;}
+    .btn-det{padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:var(--surface);font-size:11.5px;font-weight:600;color:var(--tx2);cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+    .btn-det:hover{border-color:var(--navy);color:var(--navy);}
+
+    /* ── TABELA ATENÇÃO ── */
+    .tab-aten{width:100%;border-collapse:collapse;}
+    .tab-aten thead th{padding:9px 12px;font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.6px;background:var(--page);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;}
+    .tab-aten tbody td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;}
+    .tab-aten tbody tr:last-child td{border:none;}
+    .tab-aten tbody tr:hover{background:rgba(26,58,110,.02);}
+    .td-data{color:var(--tx2);font-size:12px;white-space:nowrap;}
+    .td-obs-txt{font-size:12px;color:var(--tx2);max-width:220px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+
+    /* ── BADGES ── */
+    .nota-badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap;}
+    .nota-badge.otimo{background:rgba(5,150,105,.10);color:var(--verde);}
+    .nota-badge.bom{background:rgba(16,185,129,.10);color:var(--verde2);}
+    .nota-badge.regular{background:rgba(217,119,6,.10);color:var(--amarelo);}
+    .nota-badge.ruim{background:rgba(225,29,72,.10);color:var(--vermelho);}
+    .ref-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap;}
+    .ref-badge.cafe{background:rgba(234,88,12,.10);color:#ea580c;}
+    .ref-badge.almoco{background:rgba(37,99,235,.10);color:#2563eb;}
+    .ref-badge.jantar{background:rgba(124,58,237,.10);color:var(--roxo);}
+
+    /* ── EMPTY ── */
+    .empty{text-align:center;padding:32px;color:var(--tx3);font-size:13px;}
+
+    /* ── OVERLAY ── */
+    .overlay{position:fixed;inset:0;background:var(--page);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:opacity .4s;}
+    .overlay.oculto{opacity:0;pointer-events:none;}
+    .overlay.erro .spinner{display:none;}
+    .spinner{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .overlay-msg{font-size:14px;color:var(--tx2);text-align:center;max-width:400px;line-height:1.6;}
+    .btn-recarregar{margin-top:8px;padding:8px 20px;border-radius:8px;background:var(--navy);color:#fff;border:none;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;}
+
+    /* ── RESPONSIVO ── */
+    @media(max-width:1200px){
+      .grid-524{grid-template-columns:1fr 1fr;}.grid-222-4{grid-template-columns:1fr 1fr;}
+    }
+    @media(max-width:900px){
+      .grid4,.grid3,.grid2{grid-template-columns:1fr 1fr;}
+      .grid-524,.grid-222-4{grid-template-columns:1fr;}
+    }
+    @media(max-width:580px){
+      .grid4,.grid3,.grid2{grid-template-columns:1fr;}
+      .main{padding:14px 12px 32px;}
+      .ph{flex-direction:column;align-items:flex-start;}
+    }
+
+    /* ── GAP ROWS ── */
+    .mb14{margin-bottom:14px;}
+    .mb20{margin-bottom:20px;}
+  </style>
+</head>
+<body>
+
+<!-- OVERLAY LOADING -->
+<div class="overlay" id="overlay">
+  <div class="spinner"></div>
+  <p class="overlay-msg" id="overlay-msg">Conectando ao banco de dados…</p>
+  <button class="btn-recarregar" id="btn-recarregar" style="display:none" onclick="carregarDados(false)">🔄 Tentar novamente</button>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="main">
+
+  <!-- PAGE HEADER -->
+  <div class="ph mb20">
+    <div class="ph-left">
+      <h1>Dashboard</h1>
+      <p>Visão geral da satisfação e desempenho — <span id="data-atual"></span></p>
+    </div>
+    <div class="ph-right">
+      <button class="btn-periodo ativo" onclick="setDias(7)"  id="btn7">7 dias</button>
+      <button class="btn-periodo"       onclick="setDias(30)" id="btn30">30 dias</button>
+      <button class="btn-periodo"       onclick="setDias(90)" id="btn90">90 dias</button>
+      <div class="ph-divider"></div>
+      <button class="btn-export" onclick="exportarCSV()">⬇️ CSV</button>
+      <button class="btn-export" onclick="window.print()">🖨️ PDF</button>
+      <span class="tag-data" id="tag-periodo">—</span>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid4 mb14">
+    <div class="card">
+      <div class="kpi">
+        <div class="kpi-icon verde">😊</div>
+        <div class="kpi-body">
+          <div class="kpi-label">Satisfação geral</div>
+          <div class="kpi-val" id="kpi-sat">—</div>
+          <div class="kpi-sub">Positivas (Ótimo + Bom)</div>
+          <div class="kpi-var" id="kpi-sat-var">—</div>
+        </div>
+      </div>
+      <div style="padding:0 14px 12px"><canvas id="spark-sat" class="kpi-spark"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="kpi">
+        <div class="kpi-icon roxo">⭐</div>
+        <div class="kpi-body">
+          <div class="kpi-label">Média geral</div>
+          <div class="kpi-val" id="kpi-media">—</div>
+          <div class="kpi-sub">Escala de 1 (Ruim) a 4 (Ótimo)</div>
+          <div class="kpi-var" id="kpi-media-var">—</div>
+        </div>
+      </div>
+      <div style="padding:0 14px 12px"><canvas id="spark-media" class="kpi-spark"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="kpi">
+        <div class="kpi-icon azul">💬</div>
+        <div class="kpi-body">
+          <div class="kpi-label">Total de respostas</div>
+          <div class="kpi-val" id="kpi-total">—</div>
+          <div class="kpi-sub">No período</div>
+          <div class="kpi-var" id="kpi-total-var">—</div>
+        </div>
+      </div>
+      <div style="padding:0 14px 12px"><canvas id="spark-total" class="kpi-spark"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="kpi">
+        <div class="kpi-icon vermelho">😢</div>
+        <div class="kpi-body">
+          <div class="kpi-label">Avaliações negativas</div>
+          <div class="kpi-val" id="kpi-neg">—</div>
+          <div class="kpi-sub">Ruim</div>
+          <div class="kpi-var" id="kpi-neg-var">—</div>
+        </div>
+      </div>
+      <div style="padding:0 14px 12px"><canvas id="spark-neg" class="kpi-spark"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Evolução + Donut refeição + Média categorias -->
+  <div class="grid-524 mb14">
+
+    <!-- Evolução da satisfação -->
+    <div class="card card-p">
+      <div class="sec-title card-label-gold">Evolução da satisfação</div>
+      <div class="chart-wrap" style="height:180px">
+        <canvas id="chart-evolucao"></canvas>
+      </div>
+    </div>
+
+    <!-- Donut por refeição -->
+    <div class="card card-p">
+      <div class="sec-title card-label-gold">Satisfação por refeição</div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="position:relative;width:110px;height:110px;flex-shrink:0">
+          <canvas id="chart-ref"></canvas>
+          <div class="donut-center">
+            <div class="donut-num" id="ref-total">0</div>
+            <div class="donut-sub">Total</div>
+          </div>
+        </div>
+        <div class="leg-wrap" id="leg-ref"></div>
+      </div>
+    </div>
+
+    <!-- Média por categoria -->
+    <div class="card card-p">
+      <div class="sec-title card-label-gold">Média por categoria</div>
+      <div class="cat-lista" id="cat-lista"></div>
+      <div class="cat-escala">Escala: 1 (Ruim) a 4 (Ótimo)</div>
+    </div>
+
+  </div>
+
+  <!-- ROW 3: Distribuição + Negativas/dia + Período + Top obs -->
+  <div class="grid-222-4 mb14">
+
+    <!-- Distribuição das avaliações -->
+    <div class="card card-p">
+      <div class="sec-title card-label-gold">Distribuição das avaliações</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="position:relative;width:100px;height:100px;flex-shrink:0">
+          <canvas id="chart-distrib"></canvas>
+          <div class="donut-center">
+            <div class="donut-num" id="distrib-total">0</div>
+            <div class="donut-sub">Total</div>
+          </div>
+        </div>
+        <div class="leg-wrap" id="leg-distrib"></div>
+      </div>
+    </div>
+
+    <!-- Avaliações negativas por dia -->
+    <div class="card card-p">
+      <div class="sec-title card-label-gold">Negativas por dia</div>
+      <div class="chart-wrap" style="height:120px">
+        <canvas id="chart-neg-dia"></canvas>
+      </div>
+    </div>
+
+    <!-- Distribuição por período do dia -->
+    <div class="card card-p">
+      <div class="sec-title card-label-gold">Por período do dia</div>
+      <div class="per-lista" id="per-lista"></div>
+    </div>
+
+    <!-- Top observações -->
+    <div class="card card-p">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="sec-title" style="margin:0">Top observações</div>
+        <span style="font-size:11px;color:var(--tx3)">Frequência</span>
+      </div>
+      <div class="obs-lista" id="obs-lista"><div class="empty">Sem observações</div></div>
+      <a href="respostas.html" style="display:flex;align-items:center;gap:4px;margin-top:12px;font-size:12.5px;font-weight:600;color:var(--navy);text-decoration:none;">
+        Ver todas as observações →
+      </a>
+    </div>
+
+  </div>
+
+  <!-- ROW 4: Insights + Alertas -->
+  <div class="grid2 mb14">
+    <div class="card card-p">
+      <div class="sec-title card-label-gold">📈 Insights automáticos</div>
+      <div class="insight-lista" id="insight-lista"></div>
+    </div>
+    <div class="card card-p">
+      <div class="sec-title card-label-gold">🚨 Alertas</div>
+      <div class="alerta-lista" id="alerta-lista"></div>
+    </div>
+  </div>
+
+  <!-- ROW 5: Atenção imediata -->
+  <div class="card card-p mb14">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div class="sec-title" style="margin:0">⚠️ Atenção imediata</div>
+      <span class="sec-badge" id="badge-aten">0</span>
+      <span style="font-size:12px;color:var(--tx3)">Avaliações negativas com observação</span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tab-aten">
+        <thead><tr>
+          <th>Data/Hora</th><th>Refeição</th><th>Avaliação</th>
+          <th>Atendimento</th><th>Ambiente</th><th>Observação</th>
+        </tr></thead>
+        <tbody id="tab-aten-body"><tr><td colspan="6" class="empty">Nenhuma ocorrência</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ROW 6: Últimas avaliações negativas -->
+  <div class="card card-p">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div class="sec-title" style="margin:0">📋 Últimas avaliações negativas</div>
+      <span class="sec-badge" id="badge-neg">0</span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tab-aten">
+        <thead><tr>
+          <th>Data/Hora</th><th>Refeição</th><th>Avaliação</th>
+          <th>Atendimento</th><th>Ambiente</th><th>Nome</th><th>Observação</th>
+        </tr></thead>
+        <tbody id="tab-neg-body"><tr><td colspan="7" class="empty">Nenhuma avaliação negativa</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+  <script>window.NAV_ATIVO = "dashboard";</script>
+  <script src="js/nav.js"></script>
+
+<script>
+  const SUPABASE_URL = 'https://kosiqdzgyutdsexclzvk.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2lxZHpneXV0ZHNleGNsenZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjQyMTIsImV4cCI6MjA5MzAwMDIxMn0.Aq4ZExIo8O82eB0B2-t8Nh-NyBfCm3sb1vRhutlLOFo';
+
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let todosOsDados = [];
+  let dadosAtual   = [];
+  let dadosAnt     = [];
+  let diasFiltro   = 7;
+  let _token       = '';
+
+  // Charts
+  let cEvolucao, cRef, cDistrib, cNegDia;
+  let cSparkSat, cSparkMedia, cSparkTotal, cSparkNeg;
+
+  // ── UTILS ────────────────────────────────────────────────────
+  function notaValida(n) {
+    return n && n !== 'null' && n !== 'EMPTY' && n !== '' &&
+      ['Ótima','Ótimo','Boa','Bom','Regular','Ruim'].includes(n);
+  }
+
+  function scoreNota(n) {
+    if (!notaValida(n)) return null;
+    return {'Ótima':4,'Ótimo':4,'Boa':3,'Bom':3,'Regular':2,'Ruim':1}[n] ?? null;
+  }
+
+  function classeNota(n) {
+    if (!notaValida(n)) return '';
+    if (['Ótima','Ótimo'].includes(n)) return 'otimo';
+    if (['Boa','Bom'].includes(n))     return 'bom';
+    if (n === 'Regular')               return 'regular';
+    return 'ruim';
+  }
+
+  function nomePeriodo(p) {
+    return {cafe:'Café da Manhã',almoco:'Almoço',jantar:'Jantar'}[p] || p || '—';
+  }
+
+  function classeRef(p) {
+    return {cafe:'cafe',almoco:'almoco',jantar:'jantar'}[p] || '';
+  }
+
+  function celulaNota(v) {
+    if (!notaValida(v)) return '<em style="color:var(--tx3)">—</em>';
+    return `<span class="nota-badge ${classeNota(v)}">${v}</span>`;
+  }
+
+  function fmt(ts) {
+    if (!ts) return '—';
+    const d = new Date(ts);
+    return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})
+      + ', ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  }
+
+  function pct(a, b) { return b > 0 ? Math.round(a/b*100) : 0; }
+  function pctStr(a, b) { return b > 0 ? Math.round(a/b*100)+'%' : '—'; }
+
+  function calcMedia(dados) {
+    const vals = dados
+      .flatMap(r => [r.refeicao, r.atendimento, r.ambiente])
+      .filter(notaValida).map(scoreNota).filter(v => v !== null);
+    return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+  }
+
+  function calcMediaCat(dados, campo) {
+    const vals = dados.map(r => r[campo]).filter(notaValida).map(scoreNota).filter(v=>v!==null);
+    return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+  }
+
+  function calcPctPos(dados) {
+    const totalAv = dados.reduce((a,r)=>
+      a+[r.refeicao,r.atendimento,r.ambiente].filter(notaValida).length,0);
+    const pos = dados.reduce((a,r)=>
+      a+[r.refeicao,r.atendimento,r.ambiente].filter(n=>['Ótima','Ótimo','Boa','Bom'].includes(n)).length,0);
+    return totalAv > 0 ? pct(pos, totalAv) : null;
+  }
+
+  function calcPctNeg(dados) {
+    const totalAv = dados.reduce((a,r)=>
+      a+[r.refeicao,r.atendimento,r.ambiente].filter(notaValida).length,0);
+    const neg = dados.reduce((a,r)=>
+      a+[r.refeicao,r.atendimento,r.ambiente].filter(n=>n==='Ruim').length,0);
+    return totalAv > 0 ? pct(neg, totalAv) : null;
+  }
+
+  function varTag(atual, ant, menor=false) {
+    if (atual===null || ant===null) return '<span class="kpi-var neu">— sem dados anteriores</span>';
+    const diff = typeof atual==='number' ? atual-ant : null;
+    if (diff===null) return '';
+    const sinal = diff >= 0 ? '↑' : '↓';
+    const cls   = (diff >= 0) === !menor ? 'up' : 'down';
+    const abs   = Math.abs(diff);
+    const fmt   = Number.isInteger(abs) ? abs : abs.toFixed(2);
+    return `<span class="kpi-var ${cls}">${sinal} ${fmt} vs período anterior</span>`;
+  }
+
+  // ── AGRUPAR POR DIA ──────────────────────────────────────────
+  function agruparPorDia(dados) {
+    const g = {};
+    dados.forEach(r => {
+      const d = r.created_at?.substring(0,10);
+      if (!d) return;
+      if (!g[d]) g[d] = [];
+      g[d].push(r);
+    });
+    return g;
+  }
+
+  function diasRange(n) {
+    const dias = [];
+    for (let i=n-1; i>=0; i--) {
+      const d = new Date(); d.setDate(d.getDate()-i);
+      dias.push(d.toISOString().split('T')[0]);
+    }
+    return dias;
+  }
+
+  // ── AUTH ─────────────────────────────────────────────────────
+  async function initAuth() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return false; }
+    _token = session.access_token;
+
+    let perfil = null;
+    for (let t=1; t<=3; t++) {
+      try {
+        const rows = await fetch(
+          `${SUPABASE_URL}/rest/v1/perfis?id=eq.${session.user.id}&select=*`,
+          { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${_token}`, 'Accept': 'application/json' } }
+        ).then(r => r.json());
+        if (rows?.length) { perfil = rows[0]; break; }
+      } catch(e) { await new Promise(r=>setTimeout(r,500)); }
+    }
+
+    if (!perfil) {
+      document.getElementById('overlay-msg').innerHTML =
+        '⚠️ Perfil não encontrado.<br><small style="color:#999">ID: '+session.user.id+'</small>';
+      document.getElementById('btn-recarregar').textContent = '🔐 Voltar ao login';
+      document.getElementById('btn-recarregar').style.display = 'block';
+      document.getElementById('btn-recarregar').onclick = async ()=>{await sb.auth.signOut();location.href='login.html';};
+      return false;
+    }
+    if (!perfil.ativo) { await sb.auth.signOut(); location.href='login.html?erro=inativo'; return false; }
+
+    document.getElementById('navTop').style.display = 'flex';
+    document.getElementById('nav-user-name').textContent = perfil.nome;
+    document.getElementById('nav-badge').textContent     = perfil.perfil.toUpperCase();
+    const unEl = document.getElementById('nav-user-unidade');
+    if (unEl) unEl.textContent = perfil.unidade || 'Restaurante Comunitário de Sobradinho';
+    if (perfil.perfil === 'admin') {
+      ['nav-admin-lnk','nav-admin-lnk-mobile'].forEach(id => {
+        const el = document.getElementById(id); if(el) el.style.display='flex';
+      });
+    }
+    return true;
+  }
+
+  // ── CARREGAR DADOS ───────────────────────────────────────────
+  let _primeiraCaptura = true;
+
+  async function carregarDados(silencioso = false) {
+    const overlay  = document.getElementById('overlay');
+    const msgEl    = document.getElementById('overlay-msg');
+    const btnRec   = document.getElementById('btn-recarregar');
+
+    // Mostra overlay apenas na primeira carga ou quando explicitamente pedido
+    if (!silencioso && _primeiraCaptura) {
+      overlay.classList.remove('oculto','erro');
+      msgEl.textContent = 'Conectando ao banco de dados…';
+      btnRec.style.display = 'none';
+    }
+
+    try {
+      const rows = await fetch(
+        `${SUPABASE_URL}/rest/v1/respostas?select=*&order=created_at.desc`,
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${_token}`, 'Accept': 'application/json' } }
+      ).then(r => { if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
+
+      todosOsDados = Array.isArray(rows) ? rows : [];
+      calcularPeriodos();
+      renderizar();
+      overlay.classList.add('oculto');
+      _primeiraCaptura = false;
+    } catch(err) {
+      // Só mostra erro no overlay se for a primeira carga
+      if (_primeiraCaptura) {
+        overlay.classList.add('erro');
+        msgEl.innerHTML = `❌ Não foi possível carregar os dados.<br><small style="color:#999">${err.message}</small>`;
+        btnRec.style.display = 'block';
+        btnRec.onclick = () => carregarDados(false);
+      }
+      console.warn('Erro no refresh silencioso:', err.message);
+    }
+  }
+
+  // ── CALCULAR PERÍODOS ────────────────────────────────────────
+  function calcularPeriodos() {
+    const hoje    = new Date();
+    const iniAt   = new Date(); iniAt.setDate(hoje.getDate() - diasFiltro);
+    const iniAnt  = new Date(); iniAnt.setDate(hoje.getDate() - diasFiltro*2);
+    const iniAtStr  = iniAt.toISOString().split('T')[0];
+    const iniAntStr = iniAnt.toISOString().split('T')[0];
+    const hojeStr   = hoje.toISOString().split('T')[0];
+
+    dadosAtual = todosOsDados.filter(r => {
+      const d = r.created_at?.substring(0,10); return d >= iniAtStr && d <= hojeStr;
+    });
+    dadosAnt = todosOsDados.filter(r => {
+      const d = r.created_at?.substring(0,10); return d >= iniAntStr && d < iniAtStr;
+    });
+
+    // Tag de período
+    document.getElementById('tag-periodo').textContent =
+      iniAt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}) + ' – ' +
+      hoje.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  }
+
+  // ── RENDERIZAR ───────────────────────────────────────────────
+  function renderizar() {
+    renderKPIs();
+    renderEvolucao();
+    renderDonutRef();
+    renderMediaCat();
+    renderDistrib();
+    renderNegDia();
+    renderPeriodo();
+    renderTopObs();
+    renderInsights();
+    renderAlertas();
+    renderAtencao();
+    renderUltimasNeg();
+    document.getElementById('data-atual').textContent =
+      new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  }
+
+  // ── KPIs ─────────────────────────────────────────────────────
+  function renderKPIs() {
+    const d = dadosAtual, da = dadosAnt;
+
+    // Satisfação
+    const sat  = calcPctPos(d);
+    const satA = calcPctPos(da);
+    document.getElementById('kpi-sat').textContent   = sat !== null ? sat+'%' : '—';
+    document.getElementById('kpi-sat-var').innerHTML = varTag(sat, satA);
+
+    // Média
+    const med  = calcMedia(d);
+    const medA = calcMedia(da);
+    document.getElementById('kpi-media').textContent   = med !== null ? med.toFixed(2).replace('.',',') : '—';
+    document.getElementById('kpi-media-var').innerHTML = varTag(med ? +med.toFixed(2) : null, medA ? +medA.toFixed(2) : null);
+
+    // Total
+    document.getElementById('kpi-total').textContent   = d.length;
+    document.getElementById('kpi-total-var').innerHTML = varTag(d.length, da.length);
+
+    // Negativas
+    const neg  = calcPctNeg(d);
+    const negA = calcPctNeg(da);
+    document.getElementById('kpi-neg').textContent   = neg !== null ? neg+'%' : '—';
+    document.getElementById('kpi-neg-var').innerHTML = varTag(neg, negA, true); // menor = melhor
+
+    // Sparklines
+    const dias    = diasRange(diasFiltro);
+    const porDia  = agruparPorDia(dadosAtual);
+
+    renderSparkline('spark-sat',   dias, d => { const v=calcPctPos(d??[]); return v; }, porDia, '#059669');
+    renderSparkline('spark-media', dias, d => { const v=calcMedia(d??[]); return v ? +v.toFixed(2) : null; }, porDia, '#7c3aed');
+    renderSparkline('spark-total', dias, d => (d??[]).length, porDia, '#1a3a6e');
+    renderSparkline('spark-neg',   dias, d => { const v=calcPctNeg(d??[]); return v; }, porDia, '#e11d48');
+  }
+
+  function renderSparkline(id, dias, fn, porDia, cor) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const chart = Chart.getChart(canvas);
+    if (chart) chart.destroy();
+
+    const dados = dias.map(d => fn(porDia[d]));
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: dias,
+        datasets: [{ data: dados, borderColor: cor, borderWidth: 1.5,
+          fill: true, backgroundColor: cor+'22',
+          pointRadius: 0, tension: 0.4 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: {display:false}, tooltip: {enabled:false} },
+        scales: { x: {display:false}, y: {display:false, beginAtZero:true} },
+        animation: false
+      }
+    });
+  }
+
+  // ── EVOLUÇÃO ─────────────────────────────────────────────────
+  function renderEvolucao() {
+    const dias   = diasRange(diasFiltro);
+    const porDia = agruparPorDia(dadosAtual);
+    const satDia = dias.map(d => calcPctPos(porDia[d]??[]));
+    const medDia = dias.map(d => { const v=calcMedia(porDia[d]??[]); return v ? +v.toFixed(2) : null; });
+    const labels = dias.map(d => d.substring(5).replace('-','/'));
+
+    if (cEvolucao) cEvolucao.destroy();
+    const ctx = document.getElementById('chart-evolucao').getContext('2d');
+    cEvolucao = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Satisfação % (Ótimo+Bom)', data: satDia,
+            borderColor: '#059669', backgroundColor: '#05966922',
+            borderWidth: 2, fill: true, tension: 0.4, pointRadius: 3,
+            pointBackgroundColor: '#059669', yAxisID: 'y1' },
+          { label: 'Média geral (1-4)', data: medDia,
+            borderColor: '#1a3a6e', backgroundColor: 'transparent',
+            borderWidth: 1.5, borderDash: [4,3], tension: 0.4,
+            pointRadius: 3, pointBackgroundColor: '#1a3a6e', yAxisID: 'y2' }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: true, position: 'top',
+            labels: { boxWidth: 10, font: { size: 11 }, color: '#475569' } }
+        },
+        scales: {
+          y1: { type:'linear', position:'left', beginAtZero:true, max:100,
+            ticks: { callback: v=>v+'%', font:{size:10}, color:'#94a3b8' },
+            grid: { color:'rgba(0,0,0,0.05)' } },
+          y2: { type:'linear', position:'right', min:1, max:4,
+            ticks: { font:{size:10}, color:'#94a3b8' },
+            grid: { display: false } },
+          x: { ticks: { font:{size:10}, color:'#94a3b8' }, grid:{display:false} }
+        }
+      }
+    });
+  }
+
+  // ── DONUT REFEIÇÃO ───────────────────────────────────────────
+  function renderDonutRef() {
+    const d = dadosAtual;
+    const cont = { cafe:0, almoco:0, jantar:0 };
+    d.forEach(r => { if(cont[r.periodo]!==undefined) cont[r.periodo]++; });
+    const total = d.length;
+
+    if (cRef) cRef.destroy();
+    const ctx = document.getElementById('chart-ref').getContext('2d');
+    cRef = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        datasets: [{ data: [cont.almoco, cont.cafe, cont.jantar],
+          backgroundColor: ['#2563eb','#ea580c','#7c3aed'],
+          borderWidth: 2, borderColor: '#fff', hoverOffset: 4 }]
+      },
+      options: { responsive:true, maintainAspectRatio:false, cutout:'65%',
+        plugins: { legend:{display:false}, tooltip:{enabled:true} } }
+    });
+
+    document.getElementById('ref-total').textContent = total;
+
+    const itens = [
+      ['Almoço',       cont.almoco, '#2563eb'],
+      ['Café da Manhã',cont.cafe,   '#ea580c'],
+      ['Jantar',       cont.jantar, '#7c3aed'],
+    ];
+    document.getElementById('leg-ref').innerHTML = itens.map(([n,v,c]) =>
+      `<div class="leg-item">
+        <div class="leg-cor" style="background:${c}"></div>
+        <span class="leg-txt">${n}</span>
+        <span class="leg-val">${v}</span>
+        <span class="leg-pct">(${pctStr(v,total)})</span>
+      </div>`
+    ).join('');
+  }
+
+  // ── MÉDIA POR CATEGORIA ──────────────────────────────────────
+  function renderMediaCat() {
+    const d = dadosAtual;
+    const cats = [
+      { nome: 'Atendimento', campo: 'atendimento', cor: '#2563eb' },
+      { nome: 'Ambiente',    campo: 'ambiente',    cor: '#059669' },
+      { nome: 'Refeição',    campo: 'refeicao',    cor: '#7c3aed' },
+    ];
+    document.getElementById('cat-lista').innerHTML = cats.map(c => {
+      const v = calcMediaCat(d, c.campo);
+      const w = v !== null ? (v/4*100) : 0;
+      return `<div class="cat-item">
+        <span class="cat-nome">${c.nome}</span>
+        <div class="cat-barra-wrap"><div class="cat-barra" style="width:${w}%;background:${c.cor}"></div></div>
+        <span class="cat-val">${v !== null ? v.toFixed(2).replace('.',',') : '—'}</span>
+        <span class="cat-star">★</span>
+      </div>`;
+    }).join('');
+  }
+
+  // ── DISTRIBUIÇÃO ─────────────────────────────────────────────
+  function renderDistrib() {
+    const d = dadosAtual;
+    const cont = {'Ótimo':0,'Bom':0,'Regular':0,'Ruim':0};
+    d.forEach(r => [r.refeicao,r.atendimento,r.ambiente].forEach(n => {
+      if (!notaValida(n)) return;
+      if (['Ótima','Ótimo'].includes(n)) cont['Ótimo']++;
+      else if (['Boa','Bom'].includes(n)) cont['Bom']++;
+      else if (n==='Regular') cont['Regular']++;
+      else if (n==='Ruim') cont['Ruim']++;
+    }));
+    const total = Object.values(cont).reduce((a,b)=>a+b,0);
+
+    if (cDistrib) cDistrib.destroy();
+    const ctx = document.getElementById('chart-distrib').getContext('2d');
+    cDistrib = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        datasets: [{ data: [cont['Ótimo'],cont['Bom'],cont['Regular'],cont['Ruim']],
+          backgroundColor: ['#059669','#10b981','#d97706','#e11d48'],
+          borderWidth: 2, borderColor: '#fff', hoverOffset: 3 }]
+      },
+      options: { responsive:true, maintainAspectRatio:false, cutout:'62%',
+        plugins: { legend:{display:false} } }
+    });
+    document.getElementById('distrib-total').textContent = total;
+
+    const itens = [
+      ['Ótimo',  cont['Ótimo'],  '#059669'],
+      ['Bom',    cont['Bom'],    '#10b981'],
+      ['Regular',cont['Regular'],'#d97706'],
+      ['Ruim',   cont['Ruim'],   '#e11d48'],
+    ];
+    document.getElementById('leg-distrib').innerHTML = itens.map(([n,v,c]) =>
+      `<div class="leg-item">
+        <div class="leg-cor" style="background:${c}"></div>
+        <span class="leg-txt">${n}</span>
+        <span class="leg-val">${v}</span>
+        <span class="leg-pct">(${pctStr(v,total)})</span>
+      </div>`
+    ).join('');
+  }
+
+  // ── NEGATIVAS POR DIA ────────────────────────────────────────
+  function renderNegDia() {
+    const dias   = diasRange(diasFiltro);
+    const porDia = agruparPorDia(dadosAtual);
+    const negDia = dias.map(d => {
+      const g = porDia[d] ?? [];
+      return g.reduce((a,r)=>a+[r.refeicao,r.atendimento,r.ambiente].filter(n=>n==='Ruim').length,0);
+    });
+    const labels = dias.map(d => d.substring(5).replace('-','/'));
+
+    if (cNegDia) cNegDia.destroy();
+    const ctx = document.getElementById('chart-neg-dia').getContext('2d');
+    cNegDia = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          data: negDia, label: 'Ruim',
+          borderColor: '#e11d48', backgroundColor: '#e11d4822',
+          borderWidth: 2, fill: true, tension: 0.4,
+          pointRadius: 3, pointBackgroundColor: '#e11d48'
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend:{display:false} },
+        scales: {
+          y: { beginAtZero:true, ticks:{stepSize:1,font:{size:9},color:'#94a3b8'}, grid:{color:'rgba(0,0,0,0.05)'} },
+          x: { ticks:{font:{size:9},color:'#94a3b8'}, grid:{display:false} }
+        }
+      }
+    });
+  }
+
+  // ── POR PERÍODO DO DIA ───────────────────────────────────────
+  function renderPeriodo() {
+    const d = dadosAtual;
+    const per = { cafe:0, almoco:0, jantar:0 };
+    d.forEach(r => { if(per[r.periodo]!==undefined) per[r.periodo]++; });
+    const total = d.length;
+
+    const itens = [
+      { nome:'Manhã (06h – 11h)', chave:'cafe',   cor:'#2563eb' },
+      { nome:'Tarde (11h – 17h)', chave:'almoco', cor:'#059669' },
+      { nome:'Noite (17h – 22h)', chave:'jantar', cor:'#7c3aed' },
+    ];
+    document.getElementById('per-lista').innerHTML = itens.map(p => {
+      const v = per[p.chave];
+      const w = pct(v, total);
+      return `<div class="per-item">
+        <span class="per-nome">${p.nome}</span>
+        <div class="per-barra-wrap">
+          <div class="per-barra" style="width:${w}%;background:${p.cor}">${w>10?w+'%':''}</div>
+        </div>
+        <span class="per-val">${v} (${w}%)</span>
+      </div>`;
+    }).join('');
+  }
+
+  // ── TOP OBSERVAÇÕES ──────────────────────────────────────────
+  function renderTopObs() {
+    const stop = new Set(['de','a','o','e','em','para','com','que','do','da','no','na',
+      'um','uma','os','as','se','foi','por','mais','mas','não','já','bem',
+      'este','esta','como','quando','sobre','sua','seu','ela','ele','me','te',
+      'nos','lhe','também','ainda','assim','então','muito','tem','são','isso',
+      'isso','aqui','ali','tudo','esta','esse','ao','dos','das','às','numa',
+      'neste','nessa','pelo','pela','entre','cada','todo','toda','após','está']);
+
+    const freq = {};
+    dadosAtual.forEach(r => {
+      if (!r.observacoes?.trim()) return;
+      r.observacoes.toLowerCase()
+        .replace(/[^a-záàâãéèêíïóôõöúüç\s]/gi,' ')
+        .split(/\s+/)
+        .filter(w => w.length>3 && !stop.has(w))
+        .forEach(w => { freq[w]=(freq[w]||0)+1; });
+    });
+
+    const top = Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const max = top[0]?.[1] || 1;
+
+    if (!top.length) {
+      document.getElementById('obs-lista').innerHTML = '<div class="empty">Sem observações no período</div>';
+      return;
+    }
+
+    document.getElementById('obs-lista').innerHTML = top.map(([w,cnt]) =>
+      `<div class="obs-item">
+        <span class="obs-palavra">${w}</span>
+        <div class="obs-barra-wrap"><div class="obs-barra" style="width:${pct(cnt,max)}%"></div></div>
+        <span class="obs-cnt">${cnt}</span>
+      </div>`
+    ).join('');
+  }
+
+  // ── INSIGHTS AUTOMÁTICOS ─────────────────────────────────────
+  function renderInsights() {
+    const d = dadosAtual, da = dadosAnt;
+    const insights = [];
+
+    const sat  = calcPctPos(d);
+    const satA = calcPctPos(da);
+    if (sat !== null && satA !== null) {
+      const diff = sat - satA;
+      if (diff >= 0)
+        insights.push({icon:'📈', txt:`A satisfação geral aumentou ${diff}% em comparação ao período anterior.`});
+      else
+        insights.push({icon:'📉', txt:`A satisfação geral caiu ${Math.abs(diff)}% em comparação ao período anterior.`});
+    }
+
+    // Melhor refeição
+    const mediasRef = ['cafe','almoco','jantar'].map(p => ({
+      p, v: calcMedia(d.filter(r=>r.periodo===p))
+    })).filter(x=>x.v!==null).sort((a,b)=>b.v-a.v);
+    if (mediasRef.length) {
+      const best = mediasRef[0];
+      const semanas = Math.round(diasFiltro/7);
+      insights.push({icon:'🏆', txt:`${nomePeriodo(best.p)} mantém o melhor desempenho no período (média ${best.v.toFixed(2).replace('.',',')}).`});
+    }
+
+    // Avaliações negativas crescendo?
+    const neg  = calcPctNeg(d);
+    const negA = calcPctNeg(da);
+    if (neg !== null && negA !== null && neg > negA)
+      insights.push({icon:'⚠️', txt:`As avaliações negativas aumentaram ${neg-negA}% e merecem atenção.`});
+
+    // Categoria mais fraca
+    const cats = [
+      {nome:'Atendimento', v: calcMediaCat(d,'atendimento')},
+      {nome:'Ambiente',    v: calcMediaCat(d,'ambiente')},
+      {nome:'Refeição',    v: calcMediaCat(d,'refeicao')},
+    ].filter(c=>c.v!==null).sort((a,b)=>a.v-b.v);
+    if (cats.length && cats[0].v < 2.5)
+      insights.push({icon:'🔍', txt:`A categoria "${cats[0].nome}" tem a menor média (${cats[0].v.toFixed(2).replace('.',',')}). Requer atenção especial.`});
+
+    if (!insights.length)
+      insights.push({icon:'✅', txt:'Sem alertas críticos no período. Continue monitorando.'});
+
+    document.getElementById('insight-lista').innerHTML = insights.map(i =>
+      `<div class="insight-item">
+        <div class="insight-icone">${i.icon}</div>
+        <div class="insight-txt">${i.txt}</div>
+      </div>`
+    ).join('');
+  }
+
+  // ── ALERTAS ──────────────────────────────────────────────────
+  function renderAlertas() {
+    const d = dadosAtual;
+    const alertas = [];
+
+    // Por refeição — ruim > 15%
+    ['cafe','almoco','jantar'].forEach(p => {
+      const g = d.filter(r=>r.periodo===p);
+      const neg = calcPctNeg(g);
+      if (neg !== null && neg > 15)
+        alertas.push({ tipo:'critico', icon:'🔴',
+          titulo: `Aumento de avaliações ruins — ${nomePeriodo(p)}`,
+          desc: `${neg}% das avaliações de ${nomePeriodo(p)} são "Ruim" no período.` });
+    });
+
+    // Categoria ambiente caindo
+    const ambAt  = calcMediaCat(d,  'ambiente');
+    const ambAnt = calcMediaCat(dadosAnt, 'ambiente');
+    if (ambAt!==null && ambAnt!==null && ambAt < ambAnt)
+      alertas.push({ tipo:'atencao', icon:'🟡',
+        titulo: 'Queda na avaliação do Ambiente',
+        desc: `A média do ambiente caiu ${(ambAnt-ambAt).toFixed(2).replace('.',',')} pontos em relação ao período anterior.` });
+
+    // Alto volume de observações negativas
+    const obsNeg = d.filter(r => r.observacoes?.trim() &&
+      [r.refeicao,r.atendimento,r.ambiente].some(n=>['Regular','Ruim'].includes(n))).length;
+    if (obsNeg >= 5)
+      alertas.push({ tipo:'info', icon:'🔵',
+        titulo: 'Grande volume de observações',
+        desc: `${obsNeg} respostas possuem comentários sobre problemas no período.` });
+
+    if (!alertas.length)
+      alertas.push({ tipo:'info', icon:'✅',
+        titulo: 'Nenhum alerta no período',
+        desc: 'Os indicadores estão dentro dos limites esperados.' });
+
+    document.getElementById('alerta-lista').innerHTML = alertas.map(a =>
+      `<div class="alerta-item ${a.tipo}">
+        <div class="alerta-icone">${a.icon}</div>
+        <div class="alerta-corpo">
+          <div class="alerta-titulo">${a.titulo}</div>
+          <div class="alerta-desc">${a.desc}</div>
+        </div>
+        <button class="btn-det" onclick="location.href='respostas.html'">Ver detalhes</button>
+      </div>`
+    ).join('');
+  }
+
+  // ── ATENÇÃO IMEDIATA ─────────────────────────────────────────
+  function renderAtencao() {
+    const d = dadosAtual;
+    const neg = d.filter(r =>
+      r.observacoes?.trim() &&
+      [r.refeicao,r.atendimento,r.ambiente].some(n=>['Regular','Ruim'].includes(n))
+    ).slice(0, 10);
+
+    document.getElementById('badge-aten').textContent = neg.length;
+
+    if (!neg.length) {
+      document.getElementById('tab-aten-body').innerHTML =
+        '<tr><td colspan="6" class="empty">Nenhuma ocorrência no período ✅</td></tr>';
+      return;
+    }
+
+    document.getElementById('tab-aten-body').innerHTML = neg.map(r => `
+      <tr>
+        <td class="td-data">${fmt(r.created_at)}</td>
+        <td><span class="ref-badge ${classeRef(r.periodo)}">${nomePeriodo(r.periodo)}</span></td>
+        <td>${celulaNota(r.refeicao)}</td>
+        <td>${celulaNota(r.atendimento)}</td>
+        <td>${celulaNota(r.ambiente)}</td>
+        <td class="td-obs-txt" title="${r.observacoes||''}">${r.observacoes||'—'}</td>
+      </tr>`).join('');
+  }
+
+  // ── ÚLTIMAS AVALIAÇÕES NEGATIVAS ─────────────────────────────
+  function renderUltimasNeg() {
+    const d = dadosAtual;
+    const neg = d.filter(r =>
+      [r.refeicao,r.atendimento,r.ambiente].some(n=>n==='Ruim')
+    ).slice(0, 15);
+
+    document.getElementById('badge-neg').textContent = neg.length;
+
+    if (!neg.length) {
+      document.getElementById('tab-neg-body').innerHTML =
+        '<tr><td colspan="7" class="empty">Nenhuma avaliação "Ruim" no período ✅</td></tr>';
+      return;
+    }
+
+    document.getElementById('tab-neg-body').innerHTML = neg.map(r => `
+      <tr>
+        <td class="td-data">${fmt(r.created_at)}</td>
+        <td><span class="ref-badge ${classeRef(r.periodo)}">${nomePeriodo(r.periodo)}</span></td>
+        <td>${celulaNota(r.refeicao)}</td>
+        <td>${celulaNota(r.atendimento)}</td>
+        <td>${celulaNota(r.ambiente)}</td>
+        <td class="td-data">${r.nome||'Anônimo'}</td>
+        <td class="td-obs-txt" title="${r.observacoes||''}">${r.observacoes||'—'}</td>
+      </tr>`).join('');
+  }
+
+  // ── FILTRO DE PERÍODO ────────────────────────────────────────
+  function setDias(n) {
+    diasFiltro = n;
+    ['btn7','btn30','btn90'].forEach(id => {
+      document.getElementById(id)?.classList.remove('ativo');
+    });
+    document.getElementById(`btn${n}`)?.classList.add('ativo');
+    calcularPeriodos();
+    renderizar();
+  }
+
+  // ── EXPORTAR CSV ─────────────────────────────────────────────
+  function exportarCSV() {
+    const cab = ['Data/Hora','Refeição','Avaliação','Atendimento','Ambiente','Nome','Observações'];
+    const fmt2 = ts => { if(!ts) return ''; const d=new Date(ts); return d.toLocaleString('pt-BR'); };
+    const linhas = dadosAtual.map(r =>
+      [fmt2(r.created_at), nomePeriodo(r.periodo),
+       r.refeicao||'', r.atendimento||'', r.ambiente||'',
+       r.nome||'Anônimo', r.observacoes||'']
+      .map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')
+    );
+    const csv  = '\uFEFF' + [cab.join(','), ...linhas].join('\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const hoje = new Date().toLocaleDateString('pt-BR').replace(/\//g,'-');
+    a.href=url; a.download=`dashboard_rc_${hoje}.csv`; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── SAIR ─────────────────────────────────────────────────────
+  async function sair() {
+    await sb.auth.signOut(); location.href='login.html';
+  }
+
+  // ── INICIAR ──────────────────────────────────────────────────
+  initAuth().then(ok => {
+    if (ok) {
+      carregarDados();
+      setInterval(() => carregarDados(true), 5*60*1000); // refresh silencioso a cada 5 min
+    }
+  });
+</script>
+</body>
+</html>
