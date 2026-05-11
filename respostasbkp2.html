@@ -556,7 +556,7 @@
         </select>
       </div>
       <div class="filtros-btns">
-        <button class="btn-filtrar" onclick="recarregarEFiltrar()">🔍 Filtrar</button>
+        <button class="btn-filtrar" onclick="aplicarFiltros()">🔍 Filtrar</button>
         <button class="btn-limpar" onclick="limparFiltros()">↺ Limpar</button>
       </div>
     </div>
@@ -663,17 +663,8 @@
           </div>
         </div>
         <div class="grafico-titulo">Distribuição das avaliações (geral)</div>
-        <div style="display:flex;align-items:center;gap:16px">
-          <div style="position:relative;width:120px;height:120px;flex-shrink:0">
-            <canvas id="grafico-barras"></canvas>
-            <div style="position:absolute;inset:0;display:flex;flex-direction:column;
-              align-items:center;justify-content:center;pointer-events:none">
-              <div style="font-family:'Sora',sans-serif;font-size:20px;font-weight:800;
-                color:var(--tx1)" id="pizza-total">0</div>
-              <div style="font-size:10px;color:var(--tx3)">Total</div>
-            </div>
-          </div>
-          <div class="legenda-donut" id="legenda-pizza"></div>
+        <div class="grafico-wrap" style="height:160px">
+          <canvas id="grafico-barras"></canvas>
         </div>
       </div>
 
@@ -859,14 +850,6 @@
   }
 
   // ── FILTROS ────────────────────────────────────────────────
-  // Re-busca do banco e aplica filtros (garante dados atualizados)
-  async function recarregarEFiltrar() {
-    const btn = document.querySelector('.btn-filtrar');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Buscando…'; }
-    await carregarDados();
-    if (btn) { btn.disabled = false; btn.textContent = '🔍 Filtrar'; }
-  }
-
   function aplicarFiltros() {
     const dataIni  = document.getElementById('f-data-ini').value;
     const dataFim  = document.getElementById('f-data-fim').value;
@@ -878,10 +861,11 @@
     const minVal = ordemNota[notaMin] || 0;
 
     dadosFiltrados = todosOsDados.filter(r => {
-      // Comparar apenas a parte da data (YYYY-MM-DD) para evitar problema de timezone
-      const dataRegistro = r.created_at ? r.created_at.substring(0, 10) : '';
-      if (dataIni && dataRegistro < dataIni) return false;
-      if (dataFim && dataRegistro > dataFim) return false;
+      if (dataIni && new Date(r.created_at) < new Date(dataIni)) return false;
+      if (dataFim) {
+        const fim = new Date(dataFim); fim.setHours(23,59,59);
+        if (new Date(r.created_at) > fim) return false;
+      }
       if (refeicao && r.periodo !== refeicao) return false;
       if (aval) {
         const map = { otimo: ['Ótima','Ótimo'], bom: ['Boa','Bom'], regular: ['Regular'], ruim: ['Ruim'] };
@@ -953,44 +937,32 @@
     });
     const totalNotas = Object.values(cont).reduce((a,b)=>a+b,0);
 
-    // Gráfico pizza (donut) — distribuição geral
+    // Gráfico barras
     const ctxB = document.getElementById('grafico-barras').getContext('2d');
     if (chartBarras) chartBarras.destroy();
     chartBarras = new Chart(ctxB, {
-      type: 'doughnut',
+      type: 'bar',
       data: {
-        labels: ['Ótimo','Bom','Regular','Ruim'],
+        labels: Object.keys(cont).map(k => `${k}\n${totalNotas ? Math.round(cont[k]/totalNotas*100) : 0}%`),
         datasets: [{
-          data: [cont['Ótimo'], cont['Bom'], cont['Regular'], cont['Ruim']],
+          data: Object.values(cont),
           backgroundColor: ['#059669','#10b981','#d97706','#e11d48'],
-          borderWidth: 2, borderColor: '#fff', hoverOffset: 4
+          borderRadius: 6, borderSkipped: false,
         }]
       },
       options: {
         responsive: true, maintainAspectRatio: false,
-        cutout: '65%',
-        plugins: {
-          legend: { display: false },
+        plugins: { legend: { display: false },
           tooltip: { callbacks: {
-            label: ctx => ` ${ctx.raw} (${totalNotas ? Math.round(ctx.raw/totalNotas*100) : 0}%)`
+            label: ctx => ` ${ctx.raw} avaliações (${totalNotas ? Math.round(ctx.raw/totalNotas*100) : 0}%)`
           }}
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.05)' } },
+          x: { grid: { display: false } }
         }
       }
     });
-
-    // Total no centro e legenda
-    document.getElementById('pizza-total').textContent = totalNotas;
-    const coresPizza = ['#059669','#10b981','#d97706','#e11d48'];
-    const nomesPizza = ['Ótimo','Bom','Regular','Ruim'];
-    const valsPizza  = [cont['Ótimo'], cont['Bom'], cont['Regular'], cont['Ruim']];
-    document.getElementById('legenda-pizza').innerHTML = nomesPizza.map((n,i) =>
-      `<div class="leg-item">
-        <div class="leg-cor" style="background:${coresPizza[i]}"></div>
-        <span class="leg-txt">${n}</span>
-        <span class="leg-val">${valsPizza[i]}</span>
-        <span class="leg-pct">(${pct(valsPizza[i], totalNotas)})</span>
-      </div>`
-    ).join('');
 
     // Gráfico donut — por refeição
     const porRef = { cafe: 0, almoco: 0, jantar: 0 };
