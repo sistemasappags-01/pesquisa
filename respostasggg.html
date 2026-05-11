@@ -754,14 +754,8 @@
   let token          = '';
 
   // ── UTILS ──────────────────────────────────────────────────
-  // Retorna true apenas para notas válidas do banco
-  function notaValida(n) {
-    return n && n !== 'null' && n !== 'EMPTY' && n !== '' &&
-           ['Ótima','Ótimo','Boa','Bom','Regular','Ruim'].includes(n);
-  }
-
   function classeNota(n) {
-    if (!notaValida(n)) return '';
+    if (!n || n === 'null') return '';
     if (['Ótima','Ótimo'].includes(n)) return 'otimo';
     if (['Boa','Bom'].includes(n))     return 'bom';
     if (n === 'Regular')               return 'regular';
@@ -777,9 +771,8 @@
   }
 
   function scoreNota(n) {
-    if (!notaValida(n)) return null;
     const m = {'Ótima':4,'Ótimo':4,'Boa':3,'Bom':3,'Regular':2,'Ruim':1};
-    return m[n] ?? null;
+    return m[n] || null;
   }
 
   function classeRefeicao(r) {
@@ -796,7 +789,7 @@
   }
 
   function celulaNota(val) {
-    if (!notaValida(val))
+    if (!val || val === 'null')
       return '<em style="color:var(--tx3)">—</em>';
     return `<span class="nota-badge ${classeNota(val)}">${iconeNota(val)} ${val}</span>`;
   }
@@ -806,8 +799,7 @@
   }
 
   function mediaFmt(arr) {
-    // Filtra apenas notas válidas antes de calcular
-    const vals = arr.filter(notaValida).map(scoreNota).filter(v => v !== null);
+    const vals = arr.filter(v => v !== null).map(scoreNota).filter(v => v !== null);
     if (!vals.length) return '—';
     return (vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(2).replace('.', ',');
   }
@@ -897,11 +889,8 @@
         if (![r.refeicao, r.atendimento, r.ambiente].some(v => vals.includes(v))) return false;
       }
       if (minVal > 0) {
-        // Considera apenas notas válidas preenchidas; EMPTY/null não contam
-        const notas = [r.refeicao, r.atendimento, r.ambiente].filter(notaValida);
+        const notas = [r.refeicao, r.atendimento, r.ambiente].filter(v => v && v !== 'null');
         const ordemStr = { 'Ruim':1,'Regular':2,'Boa':3,'Bom':3,'Ótima':4,'Ótimo':4 };
-        // Exige que PELO MENOS UMA nota válida exista e que TODAS as válidas atendam o mínimo
-        if (!notas.length) return false;
         if (!notas.every(v => (ordemStr[v] || 0) >= minVal)) return false;
       }
       return true;
@@ -928,21 +917,16 @@
   // ── STATS ──────────────────────────────────────────────────
   function atualizarStats() {
     const d = dadosFiltrados;
-    // Conta apenas notas com valor válido (ignora null, EMPTY, string vazia)
     const totalAv = d.reduce((a, r) =>
-      a + [r.refeicao, r.atendimento, r.ambiente].filter(notaValida).length, 0);
+      a + [r.refeicao, r.atendimento, r.ambiente].filter(n => n && n !== 'null').length, 0);
 
     const pos = d.reduce((a,r) =>
-      a + [r.refeicao,r.atendimento,r.ambiente]
-        .filter(n => ['Ótima','Ótimo','Boa','Bom'].includes(n)).length, 0);
+      a + [r.refeicao,r.atendimento,r.ambiente].filter(n => ['Ótima','Ótimo','Boa','Bom'].includes(n)).length, 0);
     const reg = d.reduce((a,r) =>
-      a + [r.refeicao,r.atendimento,r.ambiente]
-        .filter(n => n === 'Regular').length, 0);
+      a + [r.refeicao,r.atendimento,r.ambiente].filter(n => n === 'Regular').length, 0);
     const neg = d.reduce((a,r) =>
-      a + [r.refeicao,r.atendimento,r.ambiente]
-        .filter(n => n === 'Ruim').length, 0);
-    const obs = d.filter(r => r.observacoes && r.observacoes.trim() &&
-      r.observacoes.trim() !== 'null').length;
+      a + [r.refeicao,r.atendimento,r.ambiente].filter(n => n === 'Ruim').length, 0);
+    const obs = d.filter(r => r.observacoes && r.observacoes.trim()).length;
 
     document.getElementById('st-total').textContent    = d.length;
     document.getElementById('st-positivas').textContent= pct(pos, totalAv);
@@ -960,7 +944,7 @@
     const cont = { 'Ótimo': 0, 'Bom': 0, 'Regular': 0, 'Ruim': 0 };
     d.forEach(r => {
       [r.refeicao, r.atendimento, r.ambiente].forEach(n => {
-        if (!notaValida(n)) return;   // ignora null, EMPTY, string vazia
+        if (!n || n === 'null') return;
         if (['Ótima','Ótimo'].includes(n)) cont['Ótimo']++;
         else if (['Boa','Bom'].includes(n)) cont['Bom']++;
         else if (n === 'Regular') cont['Regular']++;
